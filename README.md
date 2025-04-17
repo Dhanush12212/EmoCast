@@ -15,7 +15,7 @@
 - **Real-time Updates**: Continuously update video suggestions based on real-time mood changes.
 
 ---
-
+    
 ## Tech Stack
 
 ### Frontend
