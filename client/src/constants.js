@@ -1,0 +1,18 @@
+export const filters = [
+    "All",
+    "Gaming",
+    "Inventions",
+    "Computer programming",
+    "Kannada Cinema",
+    "CPUs",
+    "Music",
+    "Thrillers",
+    "Google",
+    "Mixes",
+    "Automobiles",
+    "Cricket",
+    "Live",
+    "Dramedy",
+    "Cars",
+    "Blogs",
+]
