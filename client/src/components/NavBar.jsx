@@ -67,7 +67,7 @@ function NavBar() {
       <div className="flex items-center justify-end gap-6 w-[25%]">
         <div className="flex items-center gap-3 bg-[#222222] hover:bg-[#3F3F3F] px-5 py-3 rounded-full cursor-pointer">
           <MdAdd className="text-white w-8 h-8" />
-          <span className="text-[#A1A1A1] text-lg font-semibold">Create</span>
+          <span className="text-white text-xl font-bold">Create</span>
         </div>
         <div className='p-2 h-12 hover:bg-[#3F3F3F] hover:rounded-full'>
           <FaRegBell className="w-8 h-8 text-white " />

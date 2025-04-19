@@ -4,35 +4,26 @@ import { SiYoutubeshorts } from "react-icons/si";
 import { MdOutlineSubscriptions } from "react-icons/md"; 
 import { CgProfile } from "react-icons/cg";
 
+export const sidebarItems = [
+  { icon: GoHomeFill, label: "Home" },
+  { icon: SiYoutubeshorts, label: "Shorts"},
+  { icon: MdOutlineSubscriptions, label: "Subscription" },  
+  { icon: CgProfile, label: "Profile" },  
+];
+
 function SideBar() {
-  return (
-    // <div className='bg-[#070707] lg:w-[17%] md:w-[30%] sm:w-[40%] px-6 py-4'>
-    <div className='p-3 '> 
+  return ( 
+    <div className='my-6 flex flex-col gap-5'> 
 
-        {/* Home */}
-        <div className='items-center text-center hover:bg-[#3D3D3D] p-3 rounded-xl'>
-            <GoHomeFill className='w-8 h-8 mb-1'/>
-            <label htmlFor="Home" className='text-sm font-medium'>Home</label>
-        </div>
+        {sidebarItems.map((item, idx) => {
+            return(
+                <div key={idx} className='hover:bg-[#3D3D3D] rounded-xl flex items-center flex-col gap-2 w-23 py-2 '>
+                    <item.icon className='w-8 h-8'/>
+                    <label htmlFor="Home" className='text-sm font-medium'>{item.label}</label>
+                </div> 
+            )
+        })} 
 
-        {/* Shorts */}
-        <div className='items-center text-center hover:bg-[#3D3D3D] p-3 rounded-xl'>
-            <SiYoutubeshorts className='w-8 h-8 mb-1'/>
-            <label htmlFor="Home" className='text-sm font-medium'>Shorts</label>
-        </div>  
-
-        {/* Subscription */}
-        <div className='items-center text-center hover:bg-[#3D3D3D] p-3 rounded-xl'>
-            <MdOutlineSubscriptions className='w-8 h-8 mb-1'/>
-            <label htmlFor="Home" className='text-sm font-medium'>Subscription</label>
-        </div> 
-
-        {/* Profile */}
-        <div className='items-center text-center hover:bg-[#3D3D3D] p-3 rounded-xl'>
-            <CgProfile className='w-8 h-8 mb-1'/>
-            <label htmlFor="Home" className='text-sm font-medium'>Profile</label>
-        </div> 
- 
     </div>
   )
 }
