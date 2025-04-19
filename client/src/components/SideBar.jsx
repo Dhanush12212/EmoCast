@@ -13,7 +13,7 @@ export const sidebarItems = [
 
 function SideBar() {
   return ( 
-    <div className='my-6 flex flex-col gap-5'> 
+    <div className='my-6 flex flex-col gap-5 mx-3'> 
 
         {sidebarItems.map((item, idx) => {
             return(

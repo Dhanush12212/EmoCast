@@ -6,11 +6,11 @@ function SideFullBar() {
   return ( 
     <div className='bg-[#171717] w-80 px-6 py-3 h-full'> 
 
-        {sidebarItems.map((item, index) => { 
-            if(item.divider) return  <div key={index} className='border-[2px] border-[#222222]'></div>;
+        {sidebarItems.map((item, idx) => { 
+            if(item.divider) return  <div key={idx} className='border-[2px] border-[#222222]'></div>;
             
             return (
-              <div key={index} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl'>
+              <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl'>
                 <item.icon className='w-8 h-8' />
                 <label htmlFor="Home" className='text-xl font-medium'>{item.label}</label>
               </div>

@@ -17,15 +17,14 @@ function NavBar() {
   };
 
   return (
-     <div className="flex items-center justify-between w-full px-5 py-1">
+     <div className="flex items-center justify-between w-full px-6 ">
       
       {/* div #1 */}
-      <div className='flex w-[15%] items-center justify-around  '>
+      <div className='flex w-[12%] items-center justify-around'>
         {/* Hamburger icon */}
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
           <IoReorderThreeOutline className="w-12 h-12 text-white hover:bg-[#222222] rounded-full cursor-pointer hover:p-2" />
-        </button> 
-
+        </button>  
 
         {/* Sidebar */}
         {isSidebarOpen && (
@@ -33,18 +32,13 @@ function NavBar() {
             <SideFullBar/>
           </div>
         )}
-
-      
+ 
         {/* YouTube logo */}
         <img className="w-42 " src={assets.YouTube} alt="YouTube Logo" />
-      </div>
-
-        <div className='w-10 fixed top-20 '>
-          <SideBar/>   
-        </div>
+      </div> 
       
       {/* div #2 */}
-      <div className='flex   min-w-[40%] items-center'> 
+      <div className='flex min-w-[50%] items-center'> 
         {/* Search bar */}
         <div className="flex mx-5 border border-[#222222] w-full h-14 bg-[#222222] pr-4 rounded-full items-center">
           <input
