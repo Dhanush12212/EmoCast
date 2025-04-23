@@ -1,6 +1,6 @@
 import React from 'react'  
 import { assets } from '../assets/assets';
-import {sidebarItems, Channels} from '../SideBarItem';
+import {sidebarItems, Channels} from '../constants';
  
 function SideFullBar() {
   return ( 
@@ -10,7 +10,7 @@ function SideFullBar() {
             if(item.divider) return  <div key={idx} className='border-[2px] border-[#222222]'></div>;
             
             return (
-              <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl'>
+              <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl cursor-pointer'>
                 <item.icon className='w-8 h-8' />
                 <label htmlFor="Home" className='text-xl font-medium'>{item.label}</label>
               </div>

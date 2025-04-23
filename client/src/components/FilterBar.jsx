@@ -12,7 +12,7 @@ function FilterBar() {
   };
 
   return (
-    <div className="relative w-[98%] px-8 py-3 h-20 left-10">
+    <div className="relative w-[96%] px-8 py-3 h-20 left-10 mt-20">
       
       <button
         onClick={() => scroll('left')}
@@ -29,8 +29,8 @@ function FilterBar() {
           {filters.map((name, idx) => (
             <button
               key={idx}
-              className={`snap-start whitespace-nowrap px-4 py-2 rounded-lg text-lg font-medium
-                 bg-[#272727]  hover:bg-[#3d3d3d]`}
+              className={`snap-start whitespace-nowrap text-[#FEFEFE] px-4 py-2 rounded-lg text-lg font-medium
+                 bg-[#272727]  hover:bg-[#3d3d3d] cursor-pointer`}
             >
               {name}
             </button>

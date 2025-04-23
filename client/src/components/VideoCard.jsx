@@ -2,7 +2,7 @@ import React from 'react';
 import { assets } from '../assets/assets';
 
 function VideoCard() {
-  const videos = Array(6).fill({
+  const videos = Array(21).fill({
     title: "Mock Coding Interview | Amazon Coding Interview",
     channel: "CodeWithHarry",
     views: "2.5k views",
@@ -14,7 +14,7 @@ function VideoCard() {
       {videos.map((video, index) => (
         <div
           key={index}
-          className="w-full sm:w-[48%] lg:w-[32%] xl:w-[30%] h-[300px] bg-[#1c1c1c] rounded-2xl flex flex-col shadow-md"
+          className="w-full sm:w-[48%] lg:w-[32%] xl:w-[30%] h-[300px]  rounded-2xl flex flex-col shadow-md cursor-pointer"
         >
           {/* Video Thumbnail */}
           <img
@@ -33,9 +33,9 @@ function VideoCard() {
               />
             </div>
             <div>
-              <h1 className="text-md font-semibold leading-tight">{video.title}</h1>
-              <p className="text-sm text-gray-400">{video.channel}</p>
-              <div className="flex gap-4 text-sm text-gray-400">
+              <h1 className="text-xl font-semibold leading-tight">{video.title}</h1>
+              <p className="text-md text-gray-400 mt-2">{video.channel}</p>
+              <div className="flex gap-4 text-md text-gray-400">
                 <p>{video.views}</p>
                 <p>{video.time}</p>
               </div>
