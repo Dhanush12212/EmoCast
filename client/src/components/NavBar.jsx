@@ -29,7 +29,7 @@ function NavBar() {
 
         {/* Sidebar */}
         {isSidebarOpen && (
-          <div className="fixed top-22 left-0 h-full z-40">
+          <div className="fixed top-20 left-0 h-full z-40">
             <SideFullBar/>
           </div>
         )}

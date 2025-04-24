@@ -1,19 +1,20 @@
 import React from 'react'  
 import { assets } from '../assets/assets';
 import {sidebarItems, Channels} from '../constants';
+import {Link} from 'react-router-dom'
  
 function SideFullBar() {
   return ( 
-    <div className='bg-[#171717] w-80 px-6 py-3 h-full'> 
+    <div className='bg-[#121212] w-80 px-6 py-3 h-full'> 
 
         {sidebarItems.map((item, idx) => { 
             if(item.divider) return  <div key={idx} className='border-[2px] border-[#222222]'></div>;
             
             return (
-              <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl cursor-pointer'>
+              <Link to={item.path} key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl cursor-pointer'>
                 <item.icon className='w-8 h-8' />
                 <label htmlFor="Home" className='text-xl font-medium'>{item.label}</label>
-              </div>
+              </Link>
             );
         })}
 
@@ -22,7 +23,7 @@ function SideFullBar() {
             <h1 className='text-2xl font-medium mt-5 mx-2'>Subscription</h1> 
             {Channels.map((name, idx) => {
                 return ( 
-                    <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl'>
+                    <div key={idx} className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl' >
                     <img
                         src={assets.Subscription}
                         alt="Profile"
