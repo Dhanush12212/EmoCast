@@ -50,9 +50,34 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 
-const loginUser = () => {
+const loginUser = asyncHandler( async(req, res) => {
+    let { email, password } = req.body;
+    
+    if( !email || !password )
+        throw new ApiError( 400, "All fields are required!");
 
-};
+    const existingUser = await User.findOne({ email });
+    if( !existingUser )
+        throw new ApiError( 400, "No user found!");
+
+    const isPasswordValid = await bcrypt.compare( password, existingUser.password);
+    if( !isPasswordValid )
+        throw new ApiError( 400, "Invalid Password!");
+
+    const token = jwt.sign({ email: existingUser.email, id: existingUser._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "12h" },
+    );
+
+    res.cookie( "token", token, { 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "Production" ? "None" : "Lax", 
+    });
+
+    return res.status(201).send( new ApiResponse( 201, existingUser, "User Login Successfully" ));
+    
+});
 
 
 const logoutUser = () => {
