@@ -80,12 +80,18 @@ const loginUser = asyncHandler( async(req, res) => {
 });
 
 
-const logoutUser = () => {
+const logoutUser = asyncHandler( async( req,res) => {
+    res.clearCookie( "token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    });
 
-};
+    return res.status(200).send( new ApiResponse( 200, "Logout Successufully"));
+});
 
 const checkLog = () => {
-
+    let {}
 };
 
 export {
