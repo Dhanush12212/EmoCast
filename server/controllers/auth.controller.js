@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import { User } from '../models/user.model.js'; 
 import bcrypt from 'bcryptjs';
 import ApiError from '../utils/ApiError.utils.js';
@@ -90,9 +90,22 @@ const logoutUser = asyncHandler( async( req,res) => {
     return res.status(200).send( new ApiResponse( 200, "Logout Successufully"));
 });
 
-const checkLog = () => {
-    let {}
-};
+const checkLog = asyncHandler( async(req, res, next) => {
+    const accessToken = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+    if( !accessToken)
+        throw new ApiError( 401,"Unauthorized request", ["Acccess token not found!"]);
+
+    const decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);
+    if( !decodedToken)
+        throw new ApiError(401, "Invalid Token", ["Token verifiication failed"]);
+
+    const user = await User.findById( decodedToken._id).select("-password");
+    if( !user)
+        throw new ApiError( 400, "User Not Login");
+
+    req.user = user;
+    next();
+});
 
 export {
     registerUser,
