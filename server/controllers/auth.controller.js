@@ -44,7 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
         sameSite: process.env.NODE_ENV === "Production" ? "None" : "Lax", 
     });
 
-    const { password: _, ...userWithoutPassword } = newUser._doc;
+    const { password: _, ...userWithoutPassword } = newUser._doc; 
 
     return res.status(201).send( new ApiResponse( 201, { user: userWithoutPassword }, "Successfully Registered.")) 
 });
