@@ -1,7 +1,5 @@
-import express from 'express';
-import asyncHandler from '../utils/asyncHandler.utils';
-import ApiError from '../utils/ApiError.utils';
-import ApiResponse from '../utils/ApiResponse.utils';
+import asyncHandler from '../utils/asyncHandler.utils.js';
+import ApiError from '../utils/ApiError.utils.js'; 
 import jwt from 'jsonwebtoken';
 
 const verifyJWT = asyncHandler( async(req, res, next) => { 
@@ -9,12 +7,13 @@ const verifyJWT = asyncHandler( async(req, res, next) => {
         if(!accessToken) 
             throw new ApiError( 401,"Unauthorized request", ["Acccess token not found!"]);
 
-        let decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);
-        if( !decodedToken)
-            throw new ApiError(401, "Invalid Token", ["Token verifiication failed"]);
-
-        req.user = decodedToken; 
-        next();
+        try {
+            let decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);    
+            req.user = decodedToken; 
+            next();
+        } catch(error) {
+            throw new ApiError(401, "Invalid Token", [ error.message || "Token verifiication failed"]);
+        }
 });
 
 export {verifyJWT}

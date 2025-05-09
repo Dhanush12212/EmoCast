@@ -1,4 +1,4 @@
-const asyncHandler = function(handlerFunction) {
+const asyncHandler = (handlerFunction) => {
     return async(req, res, next) => {
         try {
             await handlerFunction(req, res, next);
