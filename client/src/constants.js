@@ -39,7 +39,7 @@ export const Channels = [
 
 export const profileItem = [
     {divider: true},
-    { icon: FaGoogle, label: "Google Account" },
+    { icon: FaGoogle, label: "Google Account", path: '/login'},
     { icon: MdOutlineSwitchAccount, label: "Switch account" },
     { icon: PiSignOut, label: "Sign out" }, 
     {divider: true},

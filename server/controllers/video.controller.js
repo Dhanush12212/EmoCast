@@ -3,8 +3,7 @@ dotenv.config({
     path:'./.env'
 })
 
-import ApiError from "../utils/ApiError.utils.js"
-// import ApiResponse from "../utils/ApiResponse.utils.js"
+import ApiError from "../utils/ApiError.utils.js" 
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import axios from 'axios';
 
@@ -33,16 +32,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
         if (videoIds.length === 0) {
             throw new ApiError(404, "No valid video IDs found");
         }
-
-        // Fetch statistics for each video
-        const statsResponse = await axios.get( YOUTUBE_API_URL, {
-            params: {
-                part: 'statistics',
-                id: videoIds.join(','),  
-                key: YOUTUBE_API_KEY,
-            },
-        }); 
-
+        
         //To display view count in k and M form
         function formatNumber(num) {
             if (num >= 1e6) {
@@ -53,9 +43,17 @@ const fetchVideos = asyncHandler(async (req, res) => {
             }
             return num.toString() + " views";
         }
+        
+        // Fetch statistics for each video
+        const statsResponse = await axios.get( YOUTUBE_API_URL, {
+            params: {
+                part: 'statistics',
+                id: videoIds.join(','),  
+                key: YOUTUBE_API_KEY,
+            },
+        }); 
 
-        //Converting time stamp
-        // Time Ago Function
+        //Converting time stamp 
         function timeAgo(dateString) {
             const date = new Date(dateString);
             const now = new Date();
@@ -78,8 +76,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 }
             }
             return "just now";
-        } 
-
+        }  
 
         const videos = response.data.items.map(item => { 
             const stats = statsResponse.data.items.find(statItem => statItem.id === item.id); 
@@ -92,9 +89,12 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
                 channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url || 'default-channel-thumbnail.jpg',
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                views: formatNumber(stats?.statistics?.viewCount ?? '0'),
+                views: formatNumber(stats?.statistics?.viewCount ?? '0'),  
+                tags: item.snippet?.tags || [] ,
             };
         }); 
+        
+        //Sending the video response to the frontend 
         return res.status(200).json({ videos });
     } catch (error) { 
         throw new ApiError(error.response?.status || 500, error.message || "Error fetching videos");

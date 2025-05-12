@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {assets} from '../assets/assets';
 import { profileItem } from '../constants';
+import { Link } from 'react-router-dom';
 
 function Profile() { 
   return (
@@ -23,10 +24,11 @@ function Profile() {
           {profileItem.map((item, idx) => {
             if(item.divider) return <div key={idx} className='border-1 border-[#3c3c3c] w-full h-0 left-0'></div>
 
-            return (<div key={idx} className='flex gap-5 hover:bg-[#3E3E3E] rounded-xl p-3 items-center cursor-pointer'>
+            return (
+            <Link to={item.path}  key={idx} className='flex gap-5 hover:bg-[#3E3E3E] rounded-xl p-3 items-center cursor-pointer'>
               <item.icon className='w-8 h-8'/>
               <label htmlFor="" className='cursor-pointer'>{item.label}</label>
-            </div>
+            </Link>
             ) 
           })} 
         </div> 

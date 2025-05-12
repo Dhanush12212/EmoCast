@@ -1,15 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import { filters } from '../constants';
 
 function FilterBar() {
+  const [tags, setTags] = useState([]);
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
     if (!scrollRef.current) return;
     const amount = 200;  //200px
     scrollRef.current.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-  };
+  }; 
 
   return (
     <div className="relative w-[96%] px-8 py-3 h-20 left-10 mt-20">
@@ -20,7 +21,7 @@ function FilterBar() {
       >
         <AiOutlineLeft className="text-white w-5 h-6 " />
       </button>
- 
+    
       <div
         ref={scrollRef}
         className="overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"

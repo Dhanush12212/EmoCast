@@ -1,6 +1,4 @@
-import React from 'react'
-import SideBar from './SideBar'
-import FilterBar from './FilterBar'
+import React from 'react' 
 import VideoCard from './VideoCard'
 
 function HomeFeed() {

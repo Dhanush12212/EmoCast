@@ -7,6 +7,5 @@ const fetchPlaylist = asyncHandler( async( req, res) => {
 });
 
 export { 
-    fetchPlaylist,
-    
+    fetchPlaylist,  
 }
