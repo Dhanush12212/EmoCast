@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { assets } from "../assets/assets";
-import axios from "axios";
-import { Mail, Lock } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom"; 
+import axios from "axios";  
+import { MdOutlineMail, MdOutlinePassword } from "react-icons/md"; 
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import API_URL from "../../config";
 
 function Login() {
   const navigate = useNavigate();
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +20,8 @@ function Login() {
 
     try {
       const response = await axios.post(
-        `${API_URL}/Auth/login`,
-        { email: user, password },
+        `${API_URL}/auth/login`,
+        { email, password },
         { withCredentials: true }
       );
       console.log("Login successful:", response.data);
@@ -57,11 +56,11 @@ function Login() {
         {/* Inputs */}
         <div className="w-full flex flex-col gap-5">
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition mt-5">
-            <Mail className="text-white" size={20} />
+            <MdOutlineMail className="text-white" size={22} />
             <input
               type="email"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               className="bg-transparent border-none outline-none w-full text-base placeholder-gray-400 text-white "
               required
@@ -69,7 +68,7 @@ function Login() {
           </div>
 
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-lg relative hover:bg-gray-700 transition">
-            <Lock className="text-white" size={20} />
+            <MdOutlinePassword  className="text-white" size={20} />
             <input
               type={showPassword ? "text" : "password"}
               value={password}

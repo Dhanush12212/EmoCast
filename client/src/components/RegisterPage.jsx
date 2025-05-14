@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import axios from "axios";
-import { User, Mail, Lock } from "lucide-react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { MdOutlineMail, MdOutlinePassword } from "react-icons/md";  
+import { FaRegEye, FaRegEyeSlash, FaUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import API_URL from "../../config";
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -20,16 +21,21 @@ function RegisterPage() {
 
     try {
       const response = await axios.post(
-        `${API_URL}/Auth/register`,
-        { email: user, password },
+        `${API_URL}/auth/register`,
+        { username, email, password },
         { withCredentials: true }
       );
-      console.log("registered successful:", response.data);
+      // console.log("registered successful:", response.data);
+
       setMessage({ text: "🎉 Registered Successful!", type: "success" });
-      setTimeout(() => navigate("/"), 500);
+
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
+
     } catch (error) {
       console.error("Register failed:", error.response?.data || error.message);
-      setMessage({ text: "Register Failed. Check your credentials.", type: "error" });
+      setMessage({ text: "Register Failed. Try again", type: "error" });
     }
   };
 
@@ -55,31 +61,36 @@ function RegisterPage() {
 
         {/* Inputs */}
         <div className="w-full flex flex-col gap-5 mt-5">
+
+          {/* User */}
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition">
-            <User className="text-white" size={20} />
+            <FaUser  className="text-white" size={18} />
             <input
               type="text"
-              // value={user}
-              onChange={(e) => setUser(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
               className="bg-transparent border-none outline-none w-full text-base placeholder-gray-400 text-white"
               required
             />
           </div>
+
+          {/* Email */}
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition ">
-            <Mail className="text-white" size={20} />
+            <MdOutlineMail className="text-white" size={22} />
             <input
               type="email"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               className="bg-transparent border-none outline-none w-full text-base placeholder-gray-400 text-white "
               required
             />
           </div>
 
+          {/* Password */}
           <div className="flex items-center gap-3 bg-gray-800 p-4 rounded-lg relative hover:bg-gray-700 transition">
-            <Lock className="text-white" size={20} />
+            <MdOutlinePassword className="text-white" size={20} />
             <input
               type={showPassword ? "text" : "password"}
               value={password}
@@ -109,13 +120,13 @@ function RegisterPage() {
           Register
         </button>
 
-        {/* Divider */}
+        {/* Divider */} 
         <div className="flex items-center w-full">
           <div className="flex-1 h-px bg-gray-700"></div>
-          <span className="px-4 text-sm text-gray-400">or continue with</span>
+            <span className="px-4 text-sm text-gray-400">or continue with</span>
           <div className="flex-1 h-px bg-gray-700"></div>
         </div>
-
+        
         {/* Social */}
         <div className="flex justify-center w-full">
           <div className="flex items-center p-3 rounded-lg bg-slate-700 hover:bg-slate-600 cursor-pointer transition">
@@ -124,7 +135,7 @@ function RegisterPage() {
         </div>
 
         <p className="text-sm text-gray-400">
-          Already&apos;t have an account?{" "}
+          Already have an account?{" "}
           <Link to="/login" className="text-blue-400 hover:underline">
             Sign in
           </Link>
