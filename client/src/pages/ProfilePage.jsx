@@ -1,7 +1,7 @@
 import React from 'react';
-import NavBar from '../components/NavBar'; 
-import SideBar from '../components/SideBar';
-import ProfileFeed from '../components/ProfileFeed';
+import NavBar from '../components/Navabr/NavBar'; 
+import SideBar from '../components/Navabr/SideBar';
+import ProfileFeed from '../components/Feed/ProfileFeed';
 
 function Profile() { 
   

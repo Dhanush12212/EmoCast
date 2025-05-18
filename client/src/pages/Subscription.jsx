@@ -1,7 +1,7 @@
 import React from 'react';
-import NavBar from '../components/NavBar'; 
-import HomeFeed from '../components/HomeFeed';
-import SideBar from '../components/SideBar';
+import NavBar from '../components/Navabr/NavBar'; 
+import HomeFeed from '../components/Feed/HomeFeed';
+import SideBar from '../components/Navabr/SideBar';
 
 function Subscription() {
   return (

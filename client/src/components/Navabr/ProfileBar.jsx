@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
-import {assets} from '../assets/assets';
-import { profileItem } from '../constants';
+import {assets} from '../../assets/assets';
+import { profileItem } from '../../constants';
 import { Link } from 'react-router-dom';
 
 function Profile() { 

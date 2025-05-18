@@ -4,7 +4,7 @@ import axios from "axios";
 import { MdOutlineMail, MdOutlinePassword } from "react-icons/md"; 
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import API_URL from "../../config";
+import API_URL from "../../../config";
 
 function Login() {
   const navigate = useNavigate();
@@ -32,6 +32,10 @@ function Login() {
       setMessage({ text: "Login Failed. Check your credentials.", type: "error" });
     }
   };
+
+  const handleGoogleLogin = () => {
+     window.open("http://localhost:8000/api/auth/google", "_self");
+  }
 
   return (
     <div className="w-full h-screen relative flex items-center justify-center px-4"> 
@@ -107,7 +111,8 @@ function Login() {
 
         {/* Social */}
         <div className="flex justify-center w-full">
-          <div className="flex items-center p-3 rounded-lg bg-slate-700 hover:bg-slate-600 cursor-pointer transition">
+          <div className="flex items-center p-3 rounded-lg bg-slate-700 hover:bg-slate-600 cursor-pointer transition" 
+            onClick={handleGoogleLogin}>
             <FcGoogle size={24} />
           </div>
         </div>

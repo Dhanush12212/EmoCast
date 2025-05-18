@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 app.use(cors({ 
-    origin: "http://localhost:5173" ,
+    origin: process.env.FRONTEND_URL ,
     credentials: true
 }));
 
@@ -23,9 +23,17 @@ const PORT = process.env.PORT || 8000;
   
 app.get('/', (req,res) => {
     res.send(`Server listening on Port ${PORT} || 8000`);
-})
+});
 
-app.use('/api/v1/auth', authRoute);
+// app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+app.get("/api/auth/google", (req, res) => {
+  res.send("This route is working!");
+});
+
+
+
+app.use('/api/v1/auth', authRoute);-
 app.use('/api/v1/playlist', videoRoute);
 
 const startServer = async() => {

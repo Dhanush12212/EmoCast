@@ -1,8 +1,8 @@
 import React from 'react'
 import { MdOutlineSwitchAccount } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa"; 
-import { assets } from '../assets/assets';
-import SampleVideo from './SampleVideo';
+import { assets } from '../../assets/assets';
+import SampleVideo from '../SampleVideo';
 
 function ProfileFeed() {
  

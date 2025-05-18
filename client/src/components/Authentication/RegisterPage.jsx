@@ -4,7 +4,7 @@ import axios from "axios";
 import { MdOutlineMail, MdOutlinePassword } from "react-icons/md";  
 import { FaRegEye, FaRegEyeSlash, FaUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import API_URL from "../../config";
+import API_URL from "../../../config";
 
 function RegisterPage() {
   const navigate = useNavigate();

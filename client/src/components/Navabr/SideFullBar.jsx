@@ -1,6 +1,6 @@
 import React from 'react'  
-import { assets } from '../assets/assets';
-import {sidebarItems, Channels} from '../constants';
+import { assets } from '../../assets/assets';
+import {sidebarItems, Channels} from '../../constants';
 import {Link} from 'react-router-dom'
  
 function SideFullBar() {

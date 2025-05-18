@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import API_URL from '../../config';
+import API_URL from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 
@@ -9,7 +10,12 @@ function VideoCard() {
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null); // Reference for the video menu
+  const menuRef = useRef(null);  
+  const navigate = useNavigate();
+
+  const playVideo = (id) => {
+    navigate(`/video/${id}`); 
+  }
 
   // Effect for fetching videos
   useEffect(() => {
@@ -21,24 +27,24 @@ function VideoCard() {
         const response = await axios.get(`${API_URL}/playlist/videos`);
         setVideos(response.data.videos);
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch videos");
+        setError(error.response?.data?.message || "Failed to fetch videos!!");
       } finally {
         setLoading(false);
       }
     };
 
     fetchVideos();
-  }, []); // Empty dependency means this will run once when the component mounts
+  }, []);  
 
-  // Handle menu toggling
+  
   const handleMenuToggle = (id) => {
-    setOpenMenuId(openMenuId === id ? null : id); // Toggle the menu for each video
+    setOpenMenuId(openMenuId === id ? null : id);  
   };
 
   // Handle clicks outside the menu
   const handleOutsideClick = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target)) {
-      setOpenMenuId(null); // Close the menu if clicked outside
+      setOpenMenuId(null);  
     }
   };
 
@@ -51,15 +57,17 @@ function VideoCard() {
     };
   }, []);
 
-  // Ensure hooks are not being conditionally rendered based on state
-  if (loading) return <p>Loading Videos.....</p>;
-  if (error) return <p>Error: {error}</p>;
+  
+  if (loading) return <p className='flex text-2xl font-semibold justify-center'>Loading Videos.....</p>;
+  if (error) return <p className='flex text-2xl font-semibold justify-center text-red-700'>Error: {error}</p>;
 
   return (
-    <div className="flex flex-wrap justify-around gap-8 mt-5 px-6">
+    <div className="flex flex-wrap justify-around gap-8 mt-5 px-6"
+    >
       {videos.map(({ videoId, thumbnailUrl, title, channelThumbnailUrl, channelTitle, views, publishDate }) => (
         <div
           key={videoId}
+          onClick={() => playVideo(videoId)}
           className="w-full sm:w-[48%] lg:w-[32%] xl:w-[30%] h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
         >
           {/* Video Thumbnail */}
@@ -99,7 +107,7 @@ function VideoCard() {
 
               {openMenuId === videoId && (
                 <div
-                  ref={menuRef} // Use the ref to target the menu
+                  ref={menuRef} 
                   className="z-40 w-40 bg-[#282828] rounded-lg text-[#F1F1F1] shadow-md absolute top-12 right-0"
                 >
                   <VideoMenu />

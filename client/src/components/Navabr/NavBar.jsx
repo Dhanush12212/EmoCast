@@ -3,7 +3,7 @@ import { MdMic } from 'react-icons/md';
 import { MdAdd } from 'react-icons/md'; 
 import { IoSearchOutline } from 'react-icons/io5'; 
 import { IoReorderThreeOutline } from 'react-icons/io5';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 import { FaRegBell } from 'react-icons/fa';  
 import SideFullBar from './SideFullBar'; 
 import ProfileBar from './ProfileBar';
@@ -24,7 +24,7 @@ function NavBar() {
       <div className='flex w-[12%] items-center justify-around'>
         {/* Hamburger icon */}
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-          <IoReorderThreeOutline className="w-12 h-12 text-white hover:bg-[#222222] rounded-full cursor-pointer hover:p-2" />
+          <IoReorderThreeOutline className="w-10 h-10 text-white hover:bg-[#222222] rounded-full cursor-pointer hover:p-2" />
         </button>  
 
         {/* Sidebar */}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import { filters } from '../constants';
+import { filters } from '../../constants';
 
 function FilterBar() {
   const [tags, setTags] = useState([]);

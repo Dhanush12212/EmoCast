@@ -1,8 +1,8 @@
 import React from 'react';
-import NavBar from '../components/NavBar';
-import FilterBar from '../components/FilterBar';
-import HomeFeed from '../components/HomeFeed';
-import SideBar from '../components/SideBar';
+import NavBar from '../components/Navabr/NavBar';
+import FilterBar from '../components/Navabr/FilterBar';
+import HomeFeed from '../components/Feed/HomeFeed';
+import SideBar from '../components/Navabr/SideBar';
 
 function LandingPage() {
   return (
