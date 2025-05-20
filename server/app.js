@@ -30,8 +30,7 @@ app.get('/', (req,res) => {
 app.get("/api/auth/google", (req, res) => {
   res.send("This route is working!");
 });
-
-
+ 
 
 app.use('/api/v1/auth', authRoute);-
 app.use('/api/v1/playlist', videoRoute);

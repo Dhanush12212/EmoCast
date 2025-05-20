@@ -5,8 +5,10 @@ import { MdOutlineMail, MdOutlinePassword } from "react-icons/md";
 import { FaRegEye, FaRegEyeSlash, FaUser } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import API_URL from "../../../config";
+import clientID from "../../../config";
+import GoogleAuth from './GoogleAuth';
 
-function RegisterPage() {
+function RegisterPage({ register }) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -128,10 +130,8 @@ function RegisterPage() {
         </div>
         
         {/* Social */}
-        <div className="flex justify-center w-full">
-          <div className="flex items-center p-3 rounded-lg bg-slate-700 hover:bg-slate-600 cursor-pointer transition">
-            <FcGoogle size={24} />
-          </div>
+        <div className="flex justify-center w-full"> 
+          <GoogleAuth clientID='707606806122-vd24ugsb13hoq7lqmssi9eol85jqvfga.apps.googleusercontent.com' setMessage={setMessage} navigate={navigate} /> 
         </div>
 
         <p className="text-sm text-gray-400">

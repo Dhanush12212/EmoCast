@@ -18,7 +18,7 @@ function RecommendedVideo() {
       >
         {/* Video Thumbnail */}
           <img
-            src='https://i.ytimg.com/an_webp/VX7qRjDhfLs/mqdefault_6s.webp?du=3000&sqp=CI_TpcEG&rs=AOn4CLALZdGQlIhQGi4AObSWQIHDd23LIA'
+            src='https://i.ytimg.com/vi/OmedSCfI9EY/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCEPszmWSR2RvUTmVydvxv76BvjrQ'
           alt="video"
           className="w-60 h-[65%] rounded-t-2xl object-cover rounded-2xl"
           />

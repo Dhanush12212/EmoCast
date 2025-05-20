@@ -24,7 +24,7 @@ function VideoPage() {
 
           {/* Video Player */}
           <div className="w-full h-[60vh]">
-            <img src='https://i.ytimg.com/an_webp/Vl9kP6jJHSs/mqdefault_6s.webp?du=3000&sqp=CI2IpsEG&rs=AOn4CLBY7LD1hneM8r2vpAz8luntP80Ivg' alt="" className="w-full h-full object-cover rounded-2xl" />
+            <img src='https://i.ytimg.com/vi/OmedSCfI9EY/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCEPszmWSR2RvUTmVydvxv76BvjrQ' alt="" className="w-full h-full object-cover rounded-2xl" />
           </div>
 
           {/* Video Title */}

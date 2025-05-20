@@ -5,15 +5,17 @@ import { MdOutlineMail, MdOutlinePassword } from "react-icons/md";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import API_URL from "../../../config";
+import clientID from "../../../config";
+import GoogleAuth from './GoogleAuth';
 
-function Login() {
+function Login( { login }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState(false);
 
-  const togglePasswordView = () => setShowPassword(!showPassword);
+  const togglePasswordView = () => setShowPassword(!showPassword); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,11 +33,10 @@ function Login() {
       console.error("Login failed:", error.response?.data || error.message);
       setMessage({ text: "Login Failed. Check your credentials.", type: "error" });
     }
-  };
+  }; 
+  
 
-  const handleGoogleLogin = () => {
-     window.open("http://localhost:8000/api/auth/google", "_self");
-  }
+//Google Authentication 
 
   return (
     <div className="w-full h-screen relative flex items-center justify-center px-4"> 
@@ -110,11 +111,8 @@ function Login() {
         </div>
 
         {/* Social */}
-        <div className="flex justify-center w-full">
-          <div className="flex items-center p-3 rounded-lg bg-slate-700 hover:bg-slate-600 cursor-pointer transition" 
-            onClick={handleGoogleLogin}>
-            <FcGoogle size={24} />
-          </div>
+        <div className="flex justify-center w-full"> 
+            <GoogleAuth clientID="707606806122-vd24ugsb13hoq7lqmssi9eol85jqvfga.apps.googleusercontent.com" setMessage={setMessage} navigate={navigate} /> 
         </div>
 
         {/* Footer */}
