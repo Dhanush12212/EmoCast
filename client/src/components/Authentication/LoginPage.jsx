@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import axios from "axios";  
 import { MdOutlineMail, MdOutlinePassword } from "react-icons/md"; 
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import API_URL from "../../../config";
-import clientID from "../../../config";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"; 
+import { API_URL, clientID } from "../../../config"; 
 import GoogleAuth from './GoogleAuth';
 
 function Login( { login }) {
@@ -36,7 +34,7 @@ function Login( { login }) {
   }; 
   
 
-//Google Authentication 
+//Google Authentication
 
   return (
     <div className="w-full h-screen relative flex items-center justify-center px-4"> 
@@ -112,7 +110,7 @@ function Login( { login }) {
 
         {/* Social */}
         <div className="flex justify-center w-full"> 
-            <GoogleAuth clientID="707606806122-vd24ugsb13hoq7lqmssi9eol85jqvfga.apps.googleusercontent.com" setMessage={setMessage} navigate={navigate} /> 
+            <GoogleAuth clientID={clientID} setMessage={setMessage} navigate={navigate} /> 
         </div>
 
         {/* Footer */}

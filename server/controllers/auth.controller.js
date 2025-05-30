@@ -1,10 +1,13 @@
-import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js'; 
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import ApiError from '../utils/ApiError.utils.js';
 import ApiResponse from '../utils/ApiResponse.utils.js';
 import asyncHandler from '../utils/asyncHandler.utils.js';
+import { OAuth2Client } from 'google-auth-library'; 
+import sendTokenResponse from "../utils/authHelper.utils.js";
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const registerUser = asyncHandler(async (req, res) => {
     let { username, password, email } = req.body;
@@ -30,56 +33,29 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
     })
 
-    //Token Generation
-    const token = jwt.sign({ email: newUser.email, id: newUser._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "12h" }
-    );
-
-    //Cookie Storage
-    res.cookie( "token", token, {
-        //Prevent JS access
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "Production" ? "None" : "Lax", 
-    });
-
-    const { password: _, ...userWithoutPassword } = newUser._doc; 
-
-    return res.status(201).send( new ApiResponse( 201, { user: userWithoutPassword }, "Successfully Registered.")) 
+    //Token Generation & Cookie Storage handled by helper
+    return sendTokenResponse(newUser, 201, res, "Successfully Registered.");
 });
 
+//Login with JWT Token
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-const loginUser = asyncHandler( async(req, res) => {
-    let { email, password } = req.body;
-    
-    if( !email || !password )
-        throw new ApiError( 400, "All fields are required!");
+  if (!email || !password)
+    throw new ApiError(400, "All fields are required!");
 
-    const existingUser = await User.findOne({ email });
-    if( !existingUser )
-        throw new ApiError( 400, "No user found!");
+  const existingUser = await User.findOne({ email });
+  if (!existingUser)
+    throw new ApiError(400, "No user found!");
 
-    const isPasswordValid = await bcrypt.compare( password, existingUser.password);
-    if( !isPasswordValid )
-        throw new ApiError( 400, "Invalid Password!");
-
-    const token = jwt.sign({ email: existingUser.email, id: existingUser._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "12h" },
-    );
-
-    res.cookie( "token", token, { 
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "Production" ? "None" : "Lax", 
-    });
-
-    return res.status(201).send( new ApiResponse( 201, existingUser, "User Login Successfully" ));
-    
+  const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+  if (!isPasswordValid)
+    throw new ApiError(400, "Invalid Password!");
+ 
+  return sendTokenResponse(existingUser, 200, res, "User Login Successfully");
 });
 
-
+//Auth for Logout
 const logoutUser = asyncHandler( async( req,res) => {
     res.clearCookie( "token", {
         httpOnly: true,
@@ -90,6 +66,7 @@ const logoutUser = asyncHandler( async( req,res) => {
     return res.status(200).send( new ApiResponse( 200, "Logout Successufully"));
 });
 
+//Auth for checking the Log
 const checkLog = asyncHandler( async(req, res, next) => {
     const accessToken = req.cookies?.token || req.headers.authorization?.split(" ")[1];
     if( !accessToken)
@@ -98,19 +75,48 @@ const checkLog = asyncHandler( async(req, res, next) => {
     const decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);
     if( !decodedToken)
         throw new ApiError(401, "Invalid Token", ["Token verifiication failed"]);
-
-    const user = await User.findById( decodedToken._id).select("-password");
+ 
+    const user = await User.findById( decodedToken.id).select("-password");
     if( !user)
         throw new ApiError( 400, "User Not Login");
 
     req.user = user;
     next();
 });
+ 
+
+//Auth for the Google Login
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+  if (!credential)
+    throw new ApiError(400, "Google token missing");
+
+  const ticket = await client.verifyIdToken({
+    idToken: credential,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  const { email, name, picture, sub: googleId } = payload;
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = await User.create({
+      username: name,
+      email,
+      googleId,
+      profilePic: picture,
+      password: null,
+    });
+  }
+ 
+  return sendTokenResponse(user, 200, res, "Google Login Successful!");
+});
 
 export {
     registerUser,
     loginUser,
     logoutUser,
-    checkLog,
+    checkLog, 
+    googleLogin,
 }
-

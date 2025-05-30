@@ -24,12 +24,6 @@ const PORT = process.env.PORT || 8000;
 app.get('/', (req,res) => {
     res.send(`Server listening on Port ${PORT} || 8000`);
 });
-
-// app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-app.get("/api/auth/google", (req, res) => {
-  res.send("This route is working!");
-});
  
 
 app.use('/api/v1/auth', authRoute);-
