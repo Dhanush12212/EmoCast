@@ -85,7 +85,7 @@ const checkLog = asyncHandler( async(req, res, next) => {
 });
  
 
-//Auth for the Google Login
+//Auth for Google Login
 const googleLogin = asyncHandler(async (req, res) => {
   const { credential } = req.body;
   if (!credential)

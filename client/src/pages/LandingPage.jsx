@@ -1,8 +1,8 @@
 import React from 'react';
 import NavBar from '../components/Navabr/NavBar';
-import FilterBar from '../components/Navabr/FilterBar';
-import HomeFeed from '../components/Feed/HomeFeed';
+import FilterBar from '../components/Navabr/FilterBar'; 
 import SideBar from '../components/Navabr/SideBar';
+import VideoCard from '../components/Video/VideoCard';
 
 function LandingPage() {
   return (
@@ -26,8 +26,8 @@ function LandingPage() {
           </div>
 
           {/* Home Feed */}
-          <div className="pt-16"> 
-            <HomeFeed />
+          <div className="pt-16 px-10"> 
+            <VideoCard/>
           </div>
         </div>
       </div>

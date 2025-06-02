@@ -1,14 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { assets } from '../assets/assets';
 import NavBar from '../components/Navabr/NavBar';
 import { BiLike, BiDislike } from "react-icons/bi";
 import { RiShareForwardLine } from "react-icons/ri";
-import { LiaDownloadSolid } from "react-icons/lia";
-import SampleVideo from '../components/SampleVideo';
-import RecommendedVideo from '../components/Video/RecommendedVideo';
+import { LiaDownloadSolid } from "react-icons/lia"; 
+import RecommendedVideo from '../components/Video/RecommendedVideo'; 
+import axios from 'axios';
+import { API_URL } from '../../config';
+import { useParams } from 'react-router-dom';
 
 function VideoPage() { 
-  const [isMore, setIsMore] = useState(false)
+  const [isMore, setIsMore] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [video, setVideo] = useState(null);
+
+  const { id } = useParams();
+
+  useEffect( () => {
+    const fetchVideos = async() => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await axios.get(`${API_URL}/playlist/videos/${id}`);
+        setVideo(response.data);
+      } catch(err) {
+        setError(err.response?.data?.message || " Failed to fetch the video!!");
+      }
+      finally {
+        setLoading(false);
+      }
+    };
+
+
+    fetchVideos();
+  }, [id] );
+
+  if (loading) return <p className='flex text-2xl font-semibold justify-center'>Loading Videos.....</p>;
+  if (error) return <p className='flex text-2xl font-semibold justify-center text-red-700'>Error: {error}</p>;
 
   return (
     <div className="w-full h-screen bg-[#101111] text-white flex flex-col mt-20 ">
@@ -20,16 +50,29 @@ function VideoPage() {
       <div className="flex flex-1 overflow-hidden p-12 gap-5 flex-col md:flex-row ">
 
         {/* Video Section */}
-        <div className="w-full md:w-[65%] h-full flex flex-col gap-6 overflow-auto md:mb-10 ">
+        {video && (
 
-          {/* Video Player */}
+          <div 
+            key={video.videoId} 
+            className="w-full md:w-[65%] h-full flex flex-col gap-6 overflow-auto md:mb-10"
+          >
+ 
           <div className="w-full h-[60vh]">
-            <img src='https://i.ytimg.com/vi/OmedSCfI9EY/hq720.jpg?sqp=-oaymwEnCNAFEJQDSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCEPszmWSR2RvUTmVydvxv76BvjrQ' alt="" className="w-full h-full object-cover rounded-2xl" />
+              <iframe 
+                width="100%" 
+                height="438" 
+                src={`https://www.youtube.com/embed/${id}`} 
+                title={video.title}
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen="true"
+              ></iframe>
           </div>
 
-          {/* Video Title */}
+        
           <h1 className="text-2xl font-bold">
-            What&apos;s In My Tech Bag - 2025 Edition?
+            {video.title}
           </h1>
 
           {/* Video Info & Actions */}
@@ -37,13 +80,13 @@ function VideoPage() {
             {/* Channel Info */}
             <div className="flex items-center gap-4"> 
               <img
-                src={assets.Subscription}
+                src={video.channelThumbnailUrl}
                 alt="Profile"
                 className="h-14 w-14 rounded-full object-cover cursor-pointer"
               />
               <div>
-                <h2 className="text-lg font-semibold">Technical Guruji</h2>
-                <p className="text-md text-gray-400">23.7M subscribers</p>
+                <h2 className="text-lg font-semibold">{video.channelTitle}</h2>
+                <p className="text-md text-gray-400">{video.subscribers}subscribers</p>
               </div>
               <button className="ml-4 px-6 py-2 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200">
                 Subscribe
@@ -53,7 +96,7 @@ function VideoPage() {
             {/* Action Buttons */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full">
-                <BiLike className="w-6 h-6 cursor-pointer" /> 1.6k
+                <BiLike className="w-6 h-6 cursor-pointer" /> {video.likes}
               </div>
               <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full cursor-pointer">
                 <BiDislike className="w-6 h-6" />
@@ -72,8 +115,8 @@ function VideoPage() {
           {/* Description of the video */}
           <div className="w-full p-4 rounded-2xl font-semibold bg-gradient-to-b from-[#333333] to-[#272727] text-xl flex flex-col gap-5 transition-all duration-300">
             <div className='flex gap-5'>
-              <p>127K views</p>  
-              <p>17 Apr 2023</p>
+              <p>{video.views} views</p>  
+              <p>{video.publishDate}</p>
             </div>
 
             {/* This is the scroll/collapsible area */}
@@ -115,7 +158,7 @@ function VideoPage() {
             <button 
               onClick={() => setIsMore(!isMore)}
               className='outline-none mt-5 text-blue-400 hover:underline'
-            > 
+              > 
               { isMore ? "Show Less" : "Show More" }
             </button>
           </div>
@@ -123,7 +166,7 @@ function VideoPage() {
 
           {/* Comments Placeholder */}
           <div className=' flex-col gap-10 px-3 hidden md:flex'>
-            <h1 className='text-3xl font-bold'>478 Comments</h1>      
+            <h1 className='text-3xl font-bold'>{video.comments} Comments</h1>      
 
             {/* Comments */}
             <div className='flex gap-5 py-1'>
@@ -218,10 +261,11 @@ function VideoPage() {
               </div>
 
             </div>
-
           </div>
 
         </div>
+        )}
+    {/* ))} */}
 
         {/* Recommended Videos Placeholder */}
         <div className="w-full md:w-[35%] h-full bg-[#1a1b1c] rounded-xl overflow-auto shadow-md p-4"> 

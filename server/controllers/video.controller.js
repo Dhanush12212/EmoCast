@@ -9,16 +9,17 @@ import axios from 'axios';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_API_URL = process.env.YOUTUBE_API_URL;
+const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 
 //To display view count in k and M form
 function formatNumber(num) {
     if (num >= 1e6) {
-        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + "M views";
+        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + "M ";
     }
     if (num >= 1e3) {
-        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + "K views";
+        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + "K ";
     }
-    return num.toString() + " views";
+    return num.toString();
 }
 
 //Converting time stamp 
@@ -70,7 +71,6 @@ const fetchVideos = asyncHandler(async (req, res) => {
             throw new ApiError(404, "No valid video IDs found");
         }
         
-        
         // Fetch statistics for each video
         const statsResponse = await axios.get( YOUTUBE_API_URL, {
             params: {
@@ -90,7 +90,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 title: item.snippet?.title || "No title",
                 description: item.snippet?.description || "No description available",
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
-                channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url || 'default-channel-thumbnail.jpg',
+                channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
                 views: formatNumber(stats?.statistics?.viewCount ?? '0'),   
             };
@@ -100,6 +100,53 @@ const fetchVideos = asyncHandler(async (req, res) => {
         return res.status(200).json({ videos });
     } catch (error) { 
         throw new ApiError(error.response?.status || 500, error.message || "Error fetching videos");
+    }
+}); 
+
+
+const fetchSingleVideo = asyncHandler( async(req, res) => {
+    const videoId = req.params.id;
+    
+    try { 
+        const response = await axios.get(YOUTUBE_API_URL, {
+            params: {
+                part: 'snippet, statistics',
+                id: videoId,
+                key: YOUTUBE_API_KEY,
+            }
+        });
+        
+        const item = response.data.items[0];
+        if(!item)
+            throw new ApiError(404, "Video not found"); 
+
+        const channelId = item.snippet.channelId;
+        const channelResponse = await axios.get(CHANNELS_API_URL, {
+            params: {
+                part:'statistics',
+                id:channelId,
+                key:YOUTUBE_API_KEY,
+            },
+        });
+        const channel = channelResponse.data.items[0];
+        
+        const video = {
+            videoId: item.id || '', 
+            title: item.snippet?.title || "No Title",
+            description: item.snippet?.description || "No description found",
+            channelTitle: item.snippet?.channelTitle || "Unknown Channel",
+            channelThumbnailUrl: channel.snippet?.thumbnails?.high?.url || '',
+            publishDate: timeAgo(item.snippet?.publishedAt || ''),
+            views: formatNumber(item.statistics?.viewCount ?? '0'),
+            likes: formatNumber(item.statistics?.likeCount ?? '0'),
+            comments: formatNumber(item.statistics?.commentCount ?? '0'),
+            subscribers: formatNumber(channel.statistics?.subscriberCount ?? '0'),   
+        };
+
+        
+        res.status(200).json(video);
+    } catch(error) { 
+        throw new ApiError(error.response?.status || 500, error.message || "Error fetching video");
     }
 });
  
@@ -111,5 +158,6 @@ const searchVideos = asyncHandler( async( req, res) =>{
 export {
     fetchVideos,
     searchVideos, 
+    fetchSingleVideo,
 }
 

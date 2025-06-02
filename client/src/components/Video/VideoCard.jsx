@@ -53,7 +53,7 @@ function VideoCard() {
     document.addEventListener('mousedown', handleOutsideClick);
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick); // Cleanup event listener
+      document.removeEventListener('mousedown', handleOutsideClick); 
     };
   }, []);
 
@@ -68,7 +68,7 @@ function VideoCard() {
         <div
           key={videoId}
           onClick={() => playVideo(videoId)}
-          className="w-full sm:w-[48%] lg:w-[32%] xl:w-[30%] h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
+          className="w-full sm:w-[40%] lg:w-[40%] xl:w-[30%] h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
         >
           {/* Video Thumbnail */}
           <img

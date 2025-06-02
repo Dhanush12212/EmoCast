@@ -32,10 +32,11 @@ const GoogleAuth = ({ clientID , setMessage, navigate }) => {
       <div>
         <GoogleLogin
           onSuccess={handleSuccess}
+          options={{ use_fedcm_for_prompt: false }}
           onError={() =>
             setMessage({ text: "Google Login Error", type: "error" })
           }
-          useOneTap 
+          useOneTap ={false}
         />
       </div>
     </GoogleOAuthProvider>

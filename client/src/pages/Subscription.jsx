@@ -1,7 +1,7 @@
 import React from 'react';
-import NavBar from '../components/Navabr/NavBar'; 
-import HomeFeed from '../components/Feed/HomeFeed';
+import NavBar from '../components/Navabr/NavBar';  
 import SideBar from '../components/Navabr/SideBar';
+import VideoCard from '../components/Video/VideoCard';
 
 function Subscription() {
   return (
@@ -20,7 +20,7 @@ function Subscription() {
           {/* Home Feed */}
         <div className="flex-1 ml-25 overflow-x-hidden">  
             <h1 className='text-2xl font-bold text-white ml-22 my-2'>Latest</h1>
-            <HomeFeed /> 
+            <VideoCard/>
         </div>
       </div>
     </div>
