@@ -26,7 +26,7 @@ function VideoPage() {
         const response = await axios.get(`${API_URL}/playlist/videos/${id}`);
         setVideo(response.data);
       } catch(err) {
-        setError(err.response?.data?.message || " Failed to fetch the video!!");
+        setError(err.response?.data?.message || "Failed to fetch the video!!");
       }
       finally {
         setLoading(false);
@@ -76,7 +76,7 @@ function VideoPage() {
           </h1>
 
           {/* Video Info & Actions */}
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center justify-between flex-wrap gap-4 cursor-pointer">
             {/* Channel Info */}
             <div className="flex items-center gap-4"> 
               <img
@@ -88,15 +88,15 @@ function VideoPage() {
                 <h2 className="text-lg font-semibold">{video.channelTitle}</h2>
                 <p className="text-md text-gray-400">{video.subscribers}subscribers</p>
               </div>
-              <button className="ml-4 px-6 py-2 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200">
+              <button className="ml-4 px-6 py-2 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 cursor-pointer">
                 Subscribe
               </button>
             </div>
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full">
-                <BiLike className="w-6 h-6 cursor-pointer" /> {video.likes}
+              <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full cursor-pointer">
+                <BiLike className="w-6 h-6" /> {video.likes}
               </div>
               <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full cursor-pointer">
                 <BiDislike className="w-6 h-6" />
