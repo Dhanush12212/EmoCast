@@ -20,7 +20,7 @@ function VideoPage() {
   useEffect( () => {
     const fetchVideos = async() => {
       setLoading(true);
-      setError(null);
+      setError(null); 
       
       try {
         const response = await axios.get(`${API_URL}/playlist/videos/${id}`);

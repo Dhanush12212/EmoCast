@@ -55,7 +55,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
     try { 
         const response = await axios.get(YOUTUBE_API_URL, {
             params: {
-                part: 'snippet',
+                part: 'snippet, statistics',
                 chart: 'mostPopular',
                 regionCode: 'IN',
                 maxResults: 30,
@@ -75,18 +75,17 @@ const fetchVideos = asyncHandler(async (req, res) => {
             throw new ApiError(404, "No valid video IDs found");
         }
         
-        // Fetch statistics for each video
-        const statsResponse = await axios.get( YOUTUBE_API_URL, {
-            params: {
-                part: 'statistics',
-                id: videoIds.join(','),  
-                key: YOUTUBE_API_KEY,
-            },
-        }); 
+        // // Fetch statistics for each video
+        // const statsResponse = await axios.get( YOUTUBE_API_URL, {
+        //     params: {
+        //         part: 'statistics',
+        //         id: videoIds.join(','),  
+        //         key: YOUTUBE_API_KEY,
+        //     },
+        // }); 
 
 
-        const videos = response.data.items.map(item => { 
-            const stats = statsResponse.data.items.find(statItem => statItem.id === item.id); 
+        const videos = response.data.items.map(item => {  
 
             return {
                 videoId: item.id?.videoId || item.id?.playlistId || item.id?.channelId || item.id || '',
@@ -96,7 +95,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
                 channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                views: formatNumber(stats?.statistics?.viewCount ?? '0'),   
+                views: formatNumber(item.statistics?.viewCount ?? '0'),   
             };
         }); 
         
@@ -110,6 +109,9 @@ const fetchVideos = asyncHandler(async (req, res) => {
 
 const fetchSingleVideo = asyncHandler(async (req, res) => {
     const videoId = req.params.id;
+    if (!videoId) {
+        throw new ApiError(400, "Video ID parameter is required");
+    }
 
     try {
         // Fetch video details
@@ -121,9 +123,11 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             }
         });
 
-        const item = response.data.items[0];
-        if (!item)
+        if (!response.data.items || response.data.items.length === 0) {
             throw new ApiError(404, "Video not found");
+        }
+
+        const item = response.data.items[0];
 
         // Fetch channel details
         const channelId = item.snippet.channelId;
@@ -136,7 +140,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
         });
         const channel = channelResponse.data.items[0];
 
-        // Fetch video Captions
+        // Fetch captions
         let captions = "No captions available";
         try {
             const captionResponse = await axios.get(`${CAPTIONS_API_URL}?lang=en&v=${videoId}`);
@@ -144,10 +148,10 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             const texts = parsed.transcript?.text?.map(entry => entry._) || [];
             captions = texts.join(' ');
         } catch (e) {
-            captions = "Captions not found or Unavailable";
+            captions = "Captions not found or unavailable";
         }
 
-        // Fetch Recommended videos
+        // Fetch recommended videos
         const recommendedResponse = await axios.get(RECOMMENDED_API_URL, {
             params: {
                 part: 'snippet',
@@ -158,25 +162,23 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             },
         });
 
-        const recommendedItems = recommendedResponse.data.items;
-        const videoIds = recommendedItems.map(item => item.id.videoId).filter(id => id);
+        const recommendedItems = recommendedResponse.data.items || [];
+        const recommendedVideoIds = recommendedItems.map(item => item.id.videoId).filter(Boolean);
 
-        if (videoIds.length === 0) {
-            throw new ApiError(404, "No valid video IDs found");
+        // Fetch stats for recommended videos only if IDs present
+        let statsMap = {};
+        if (recommendedVideoIds.length > 0) {
+            const statsResponse = await axios.get(YOUTUBE_API_URL, {
+                params: {
+                    part: 'statistics',
+                    id: recommendedVideoIds.join(','),
+                    key: YOUTUBE_API_KEY,
+                },
+            });
+            statsResponse.data.items.forEach(item => {
+                statsMap[item.id] = item.statistics;
+            });
         }
-
-        const statsResponse = await axios.get(RECOMMENDED_API_URL, {
-            params: {
-                part: 'statistics',
-                id: videoIds.join(','),
-                key: YOUTUBE_API_KEY,
-            },
-        });
-
-        const statsMap = {};
-        statsResponse.data.items.forEach(item => {
-            statsMap[item.id] = item.statistics;
-        });
 
         const recommendedVideos = recommendedItems.map(item => {
             const stats = statsMap[item.id.videoId] || {};
@@ -203,9 +205,11 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
         const comments = commentResponse.data.items.map(comment => ({
             author: comment.snippet.topLevelComment.snippet.authorDisplayName,
             text: comment.snippet.topLevelComment.snippet.textDisplay,
-            likesCount: timeAgo(comment.snippet.topLevelComment.snippet.publishedAt),
+            publishedAt: timeAgo(comment.snippet.topLevelComment.snippet.publishedAt),
+            likeCount: formatNumber(comment.snippet.topLevelComment.snippet.likeCount ?? '0')
         }));
 
+        // Final structured video object
         const video = {
             videoId: item.id || '',
             title: item.snippet?.title || "No Title",
@@ -215,19 +219,22 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             publishDate: timeAgo(item.snippet?.publishedAt || ''),
             views: formatNumber(item.statistics?.viewCount ?? '0'),
             likes: formatNumber(item.statistics?.likeCount ?? '0'),
-            comments: formatNumber(item.statistics?.commentCount ?? '0'),
+            commentsCount: formatNumber(item.statistics?.commentCount ?? '0'),
             subscribers: formatNumber(channel.statistics?.subscriberCount ?? '0'),
-            caption: item.contentDetails?.caption || "No Captions",
+            captionStatus: item.contentDetails?.caption || "No Captions",
             captions,
-            // recommendedVideos,
-            comments
+            recommendedVideos,
+            comments,
         };
 
         res.status(200).json(video);
     } catch (error) {
+        console.error("Error fetching video data:", error.response?.data || error.message);
         throw new ApiError(error.response?.status || 500, error.message || "Error fetching video");
     }
 });
+
+
  
 const searchVideos = asyncHandler( async( req, res) =>{
 
