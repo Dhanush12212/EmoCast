@@ -5,7 +5,7 @@ import Profile from './pages/ProfilePage';
 import Subscription from './pages/Subscription';
 import LoginPage from './components/Authentication/LoginPage';
 import RegisterPage from './components/Authentication/RegisterPage';
-import Video from './pages/VideoPage';
+import VideoPage from './pages/VideoPage';
 
 function App() {
   return ( 
@@ -16,7 +16,7 @@ function App() {
         <Route path='/subscription' element={<Subscription/>} />   
         <Route path='/login' element={<LoginPage/>} />   
         <Route path='/register' element={<RegisterPage/>} /> 
-        <Route path='/video/:id' element={ <Video/> } />
+        <Route path='/video/:id' element={ <VideoPage/> } />
       </Routes>
     </Router> 
   )

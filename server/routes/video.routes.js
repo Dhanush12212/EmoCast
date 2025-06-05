@@ -7,7 +7,7 @@ const router = Router();
 router.route("/search").get(searchVideos);
 router.route("/videos").get(fetchVideos);
 router.route("/plylist").get(fetchPlaylist);
-router.route("/videos/:id").get(fetchSingleVideo);
+router.route("/video/:id").get(fetchSingleVideo);
 
 
 export default router;

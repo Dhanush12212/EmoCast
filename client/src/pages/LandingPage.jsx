@@ -1,7 +1,7 @@
 import React from 'react';
-import NavBar from '../components/Navabr/NavBar';
-import FilterBar from '../components/Navabr/FilterBar'; 
-import SideBar from '../components/Navabr/SideBar';
+import NavBar from '../components/NavBar/NavBar';
+import FilterBar from '../components/NavBar/FilterBar'; 
+import SideBar from '../components/NavBar/SideBar';
 import VideoCard from '../components/Video/VideoCard';
 
 function LandingPage() {
