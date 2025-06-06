@@ -100,13 +100,11 @@ const fetchVideos = asyncHandler(async (req, res) => {
 const fetchSingleVideo = asyncHandler(async (req, res) => {
     
     try {
-        // const videoId = req.params.id;
-        const videoId = "7u1uA8HoepI";
+        const videoId = req.params.id; 
         if (!videoId) {
             throw new ApiError(400, "Video ID parameter is required");
         }
-
-        console.log("🟢 fetchSingleVideo called with ID:", videoId);
+ 
         // Fetch main video details
         const response = await axios.get(YOUTUBE_API_URL, {
             params: {
@@ -131,66 +129,9 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
                 key: YOUTUBE_API_KEY,
             },
         });
-
+        
         const channel = channelResponse.data.items[0];
-
-        // Fetch recommended videos (Search API)
-        const recommendedResponse = await axios.get(SEARCH_API_URL, {
-            params: {
-                part: 'snippet',
-                relatedToVideoId: videoId,
-                type: 'video',
-                maxResults: 20,
-                key: YOUTUBE_API_KEY,
-            },
-        });
-
-        const recommendedItems = recommendedResponse.data.items || [];
-
-        // Safely extract recommended video IDs
-        const recommendedVideoIds = recommendedItems
-            .map(item => {
-                if (item.id && typeof item.id.videoId === 'string') {
-                    return item.id.videoId.trim();
-                }
-                return null;
-            })
-            .filter(id => id && id.length > 0);
-
-            console.log("📺 Requested video ID:", `"${videoId}"`);
-console.log("📺 Type of video ID:", typeof videoId);
-console.log("📺 Length of video ID:", videoId.length);
-
-        // Fetch statistics for recommended videos only if IDs are available
-        let statsMap = {};
-        if (recommendedVideoIds.length > 0) {
-            const statsResponse = await axios.get(YOUTUBE_API_URL, {
-                params: {
-                    part: 'statistics',
-                    id: recommendedVideoIds.join(','),
-                    key: YOUTUBE_API_KEY,
-                },
-            });
-
-            statsResponse.data.items.forEach(statItem => {
-                statsMap[statItem.id] = statItem.statistics;
-            });
-        }  
-
-        // Build recommended videos array with stats
-        const recommendedVideos = recommendedItems.map(item => {
-            const vId = item.id.videoId;
-            const stats = statsMap[vId] || {};
-            return {
-                videoId: vId,
-                title: item.snippet.title,
-                thumbnailUrl: item.snippet.thumbnails?.high?.url || '',
-                channelTitle: item.snippet.channelTitle,
-                publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                views: formatNumber(stats.viewCount ?? '0'),
-            };
-        });
-
+        
         // Fetch comments for the main video
         const commentResponse = await axios.get(COMMENTS_API_URL, {
             params: {
@@ -200,7 +141,7 @@ console.log("📺 Length of video ID:", videoId.length);
                 key: YOUTUBE_API_KEY,
             },
         });
-
+        
         const comments = commentResponse.data.items.map(comment => ({
             author: comment.snippet.topLevelComment.snippet.authorDisplayName,
             text: comment.snippet.topLevelComment.snippet.textDisplay,
@@ -208,6 +149,52 @@ console.log("📺 Length of video ID:", videoId.length);
             likeCount: formatNumber(comment.snippet.topLevelComment.snippet.likeCount ?? 0),
             commentThumbnail: comment.snippet.topLevelComment.snippet.authorProfileImageUrl || '',
         }));
+         
+       const recommendedResponse = await axios.get(YOUTUBE_API_URL, {
+           params: {
+               part: 'snippet,statistics',  
+               chart: 'mostPopular',
+               regionCode: 'US',
+               maxResults: 20,
+               key: YOUTUBE_API_KEY,
+           },
+       });
+
+       const recommendedItems = recommendedResponse.data.items || [];
+
+        // const recommendedVideoIds = recommendedItems
+        //     .map(item => { item.id.videoId.trim()})
+        //     .filter(id => id && id.length > 0); 
+
+        // // Fetch statistics for recommended videos only if IDs are available
+        // let statsMap = {};
+        // if (recommendedVideoIds.length > 0) {
+        //     const statsResponse = await axios.get(YOUTUBE_API_URL, {
+        //         params: {
+        //             part: 'statistics',
+        //             id: recommendedVideoIds.join(','),
+        //             key: YOUTUBE_API_KEY,
+        //         },
+        //     });
+
+        //     statsResponse.data.items.forEach(statItem => {
+        //         statsMap[statItem.id] = statItem.statistics;
+        //     });
+        // }
+
+        // Build recommended videos array with stats
+        const recommendedVideos = recommendedItems.map(item => { 
+            // const vId = item.id;
+            // const stats = statsMap[vId] || {};
+            return {
+                videoId: item.id,
+                title: item.snippet.title,
+                thumbnailUrl: item.snippet.thumbnails?.high?.url || '',
+                channelTitle: item.snippet.channelTitle,
+                publishDate: timeAgo(item.snippet?.publishedAt || ''),
+                views: formatNumber(item.statistics?.viewCount ?? '0'),
+            };
+        });
 
         // Final video object
         const video = {
