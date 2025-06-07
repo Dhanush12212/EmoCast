@@ -6,6 +6,7 @@ import Subscription from './pages/Subscription';
 import LoginPage from './components/Authentication/LoginPage';
 import RegisterPage from './components/Authentication/RegisterPage';
 import VideoPage from './pages/VideoPage';
+import VideoCard from './components/Video/VideoCard';
 
 function App() {
   return ( 
@@ -17,6 +18,7 @@ function App() {
         <Route path='/login' element={<LoginPage/>} />   
         <Route path='/register' element={<RegisterPage/>} /> 
         <Route path='/videos/:id' element={ <VideoPage/> } />
+        <Route path="/search/:query" element={<VideoCard />} />
       </Routes>
     </Router> 
   )

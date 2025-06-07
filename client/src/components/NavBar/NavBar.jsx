@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MdMic } from 'react-icons/md';
 import { MdAdd } from 'react-icons/md'; 
 import { IoSearchOutline } from 'react-icons/io5'; 
@@ -12,9 +13,22 @@ function NavBar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search/${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    }
   };
 
   return (
@@ -48,8 +62,12 @@ function NavBar() {
             type="search"
             value={searchTerm}
             onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
             />
-          <IoSearchOutline className="w-9 h-10 text-white ml-5 mr-3" /> 
+          <IoSearchOutline 
+            className="w-9 h-10 text-white ml-5 mr-3"  
+            onClick={handleSearchSubmit}  
+          /> 
         </div > 
       
         {/* Mic */}

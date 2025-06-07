@@ -51,6 +51,7 @@ function timeAgo(dateString) {
     return "just now";
 }  
 
+//Fetching Videos for the Home Page
 const fetchVideos = asyncHandler(async (req, res) => {
     try { 
         const response = await axios.get(YOUTUBE_API_URL, {
@@ -85,7 +86,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
                 channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                views: formatNumber(item.statistics?.viewCount ?? '0'),   
+                viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
             };
         }); 
         
@@ -96,7 +97,8 @@ const fetchVideos = asyncHandler(async (req, res) => {
     }
 }); 
 
- 
+
+//Fetch Single video for VideoPage
 const fetchSingleVideo = asyncHandler(async (req, res) => {
     
     try {
@@ -183,16 +185,14 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
         // }
 
         // Build recommended videos array with stats
-        const recommendedVideos = recommendedItems.map(item => { 
-            // const vId = item.id;
-            // const stats = statsMap[vId] || {};
+        const recommendedVideos = recommendedItems.map(item => {  
             return {
                 videoId: item.id,
                 title: item.snippet.title,
                 thumbnailUrl: item.snippet.thumbnails?.high?.url || '',
                 channelTitle: item.snippet.channelTitle,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                views: formatNumber(item.statistics?.viewCount ?? '0'),
+                viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
             };
         });
 
@@ -204,8 +204,8 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             channelTitle: item.snippet?.channelTitle || "Unknown Channel",
             channelThumbnailUrl: channel.snippet?.thumbnails?.high?.url || '',
             publishDate: timeAgo(item.snippet?.publishedAt || ''),
-            views: formatNumber(item.statistics?.viewCount ?? '0'),
-            likes: formatNumber(item.statistics?.likeCount ?? '0'),
+            viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
+            likeCount: formatNumber(item.statistics?.likeCount ?? '0'),
             commentsCount: formatNumber(item.statistics?.commentCount ?? '0'),
             subscribers: formatNumber(channel.statistics?.subscriberCount ?? '0'),
             captionStatus: item.contentDetails?.caption || "No Captions",
@@ -220,14 +220,73 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
     }
 });
 
-const searchVideos = asyncHandler( async( req, res) =>{
+//Controller for Search Videos
+const searchVideos = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  if (!q) {
+    throw new ApiError(400, 'Search query is required');
+  }
 
+  try {
+    //Fetch Search videos
+    const searchResponse = await axios.get(SEARCH_API_URL, {
+      params: {
+        part: 'snippet',
+        maxResults: 100,
+        q,
+        type: 'video',
+        key: YOUTUBE_API_KEY,
+      },
+    });
+
+    const videoIds = searchResponse.data.items.map(item => item.id.videoId).filter(Boolean);
+
+    if (videoIds.length === 0) {
+      return res.status(200).json({ videos: [] });
+    }
+
+    //Fetch statistics for these video IDs
+    const statsResponse = await axios.get(YOUTUBE_API_URL, {
+      params: {
+        part: 'statistics',
+        id: videoIds.join(','),
+        key: YOUTUBE_API_KEY,
+      },
+    });
+ 
+    const statsMap = {};
+    statsResponse.data.items.forEach(item => {
+      statsMap[item.id] = item.statistics;
+    });
+ 
+    const formattedDetails = searchResponse.data.items.map(item => {
+      const videoId = item.id.videoId || '';
+      const stats = statsMap[videoId] || {};
+
+      return {
+        videoId,
+        thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
+        title: item.snippet?.title || 'No Title',
+        channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
+        channelThumbnailUrl: 'https://via.placeholder.com/100',  
+        publishDate: timeAgo(item.snippet?.publishedAt || ''),
+        viewCount: stats.viewCount || '0',
+        likeCount: stats.likeCount || '0',
+        commentCount: stats.commentCount || '0',
+      };
+    });
+
+    res.status(200).json({ videos: formattedDetails });
+  } catch (error) {
+    console.log("Error Searching Videos", error.message);
+    throw new ApiError(500, 'Failed to Fetch the videos from Youtube API');
+  }
 });
 
 
 export {
     fetchVideos,
-    searchVideos, 
     fetchSingleVideo,
+    searchVideos, 
 }
 
