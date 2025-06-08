@@ -27,7 +27,7 @@ function VideoCard() {
       try {
         let response;
         if (query) { 
-          response = await axios.get(`${API_URL}/searchVideos/search`, {
+          response = await axios.get(`${API_URL}/playlist/search`, {
             params: { q: query }
           });
         } else {
