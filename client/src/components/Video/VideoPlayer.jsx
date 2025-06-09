@@ -18,22 +18,39 @@ function MainVideoSection({ video }) {
     commentsCount
   } = video || {};
 
+  const linkify = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.split('\n').map((line, i) => (
+    <React.Fragment key={i}>
+      {line.split(urlRegex).map((part, j) =>
+        urlRegex.test(part) ? (
+          <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+      <br />
+    </React.Fragment>
+  ));
+};
+
   return (
     <div
       key={videoId}
       className="w-full md:w-[65%] h-full flex flex-col gap-6 overflow-auto md:mb-10 p-3"
     >
       {/* Video Player */}
-      <div className="w-full h-[60vh]">
+      <div className="w-full h-[80vh]">
         <iframe
           width="100%"
           height="438"
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`}
-          title={title}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`} 
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
+          allowFullScreen='True'
         ></iframe>
       </div>
 
@@ -83,15 +100,16 @@ function MainVideoSection({ video }) {
         </div>
 
         <div className={`transition-all duration-300 ${isMore ? 'max-h-[1000px]' : 'max-h-40 overflow-hidden'}`}>
-          <p>{description}</p>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{linkify(description)}</p>
         </div>
 
-        <button 
+        <button
           onClick={() => setIsMore(!isMore)}
-          className='outline-none mt-2 text-blue-400 hover:underline cursor-pointer'
+          className={`mt-3 text-md font-medium text-blue-500 transition-all duration-200 hover:text-blue-600 hover:underline outline-none`}
         >
-          {isMore ? "Show Less" : "Show More"}
+          {isMore ? "▲ Show Less" : "▼ Show More"}
         </button>
+
       </div>
 
       {/* Comments */}

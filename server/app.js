@@ -6,6 +6,7 @@ import connectDB from './db/connectDB.js';
 import cookieParser from 'cookie-parser';
 import authRoute from './routes/auth.routes.js';
 import videoRoute from './routes/video.routes.js';
+import searchRoute from './routes/search.routes.js';
 import cors from 'cors';
 const app = express();
 
@@ -28,7 +29,7 @@ app.get('/', (req,res) => {
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/playlist', videoRoute);
-// app.use('/api/v1/searchVideos', videoRoute);
+app.use('/api/v1/searchVideos', searchRoute);
 
 const startServer = async() => {
     try{

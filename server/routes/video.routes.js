@@ -1,13 +1,11 @@
 import { Router } from 'express';
-import { fetchVideos, searchVideos, fetchSingleVideo, searchVideos } from "../controllers/video.controller.js";
+import { fetchVideos, fetchSingleVideo } from "../controllers/video.controller.js";
 import { fetchPlaylist } from "../controllers/playlist.controller.js"; 
 
 const router = Router();
-
-router.route("/search").get(searchVideos);
+ 
 router.route("/videos").get(fetchVideos);
 router.route("/plylist").get(fetchPlaylist);
-router.route("/video/:id").get(fetchSingleVideo);  
-router.route("/search").get(searchVideos);
+router.route("/video/:id").get(fetchSingleVideo);   
 
 export default router; 

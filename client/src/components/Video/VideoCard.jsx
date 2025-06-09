@@ -27,11 +27,10 @@ function VideoCard() {
       try {
         let response;
         if (query) { 
-          response = await axios.get(`${API_URL}/playlist/search`, {
+          response = await axios.get(`${API_URL}/searchVideos/search`, {
             params: { q: query }
           });
-        } else {
-          // Else, fetch the default playlist videos
+        } else { 
           response = await axios.get(`${API_URL}/playlist/videos`);
         }
 
@@ -80,8 +79,9 @@ function VideoCard() {
                 videoId,
                 thumbnailUrl,
                 title,
-                channelThumbnailUrl,
+                channelThumbnail,
                 channelTitle,
+                channelInitial,
                 viewCount,
                 publishDate,
               }) => (
@@ -105,15 +105,23 @@ function VideoCard() {
                   <div className="py-3 flex justify-between">
                     <div className="flex gap-3">
                       <div className="h-14 w-14 flex justify-center items-center rounded-full overflow-hidden border border-red-400 shrink-0">
-                        <img
-                          src={channelThumbnailUrl}
-                          alt={channelTitle}
-                          className="w-full h-full object-cover rounded"
-                        />
-                      </div>
-
+                        {channelThumbnail ? (
+                          <img
+                            src={channelThumbnail}
+                            alt={channelTitle}
+                            className="w-full h-full object-cover rounded"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-300 text-white font-semibold text-lg uppercase">
+                            {channelInitial}
+                          </div>
+                        )}
+                      </div> 
                       <div>
-                        <h1 className="text-xl font-semibold leading-tight">{title}</h1>
+                        <h1 className="text-xl font-semibold leading-tight line-clamp-2">
+                          {title}
+                        </h1>
+
                         <p className="text-lg text-gray-400 mt-2">{channelTitle}</p>
                         <div className="flex gap-3 text-lg text-gray-400">
                           <p>{viewCount}</p>

@@ -192,7 +192,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
                 thumbnailUrl: item.snippet.thumbnails?.high?.url || '',
                 channelTitle: item.snippet.channelTitle,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
+                viewCount: formatNumber(item.statistics?.viewCount ?? '0'), 
             };
         });
 
@@ -238,6 +238,7 @@ const searchVideos = asyncHandler(async (req, res) => {
         key: YOUTUBE_API_KEY,
       },
     });
+    const items = searchResponse.data.items;
 
     const videoIds = searchResponse.data.items.map(item => item.id.videoId).filter(Boolean);
 
@@ -258,17 +259,34 @@ const searchVideos = asyncHandler(async (req, res) => {
     statsResponse.data.items.forEach(item => {
       statsMap[item.id] = item.statistics;
     });
+
+    const channelIds = [...new Set(items.map(item => item.snippet.channelId))].join(',');
+    const channelResponse = await axios.get(CHANNELS_API_URL, {
+        params: {
+            part: 'snippet,statistics',
+            id: channelIds,
+            key: YOUTUBE_API_KEY,
+        },
+    });
+        
+    const channelThumbnailMap = {};
+    channelResponse.data.items.forEach(channel => {
+      channelThumbnailMap[channel.id] = channel.snippet.thumbnails.high?.url;
+    });
  
     const formattedDetails = searchResponse.data.items.map(item => {
       const videoId = item.id.videoId || '';
       const stats = statsMap[videoId] || {};
+      const channelId = item.snippet.channelId;
+      const channelThumbnail = channelThumbnailMap[channelId];
 
       return {
         videoId,
         thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
         title: item.snippet?.title || 'No Title',
         channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
-        channelThumbnailUrl: 'https://via.placeholder.com/100',  
+        channelThumbnail,
+        channelInitial: !channelThumbnail ? item.snippet?.channelTitle?.charAt(0).toUpperCase() : null,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
         viewCount: stats.viewCount || '0',
         likeCount: stats.likeCount || '0',

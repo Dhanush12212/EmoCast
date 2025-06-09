@@ -39,7 +39,7 @@ function RecommendedVideo({ videos = [] }) {
             <p className="text-sm text-gray-400 mt-1">{channelTitle}</p>
             <div className="flex gap-3 text-sm text-gray-500 mt-1">
               <span>{viewCount}</span>
-              <span>•</span>
+              <span>&bull;</span>
               <span>{publishDate}</span>
             </div>
           </div>
