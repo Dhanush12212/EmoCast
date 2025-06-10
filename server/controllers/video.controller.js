@@ -84,7 +84,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 title: item.snippet?.title || "No title",
                 description: item.snippet?.description || "No description available",
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
-                channelThumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+                channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
             };
@@ -268,25 +268,17 @@ const searchVideos = asyncHandler(async (req, res) => {
             key: YOUTUBE_API_KEY,
         },
     });
-        
-    const channelThumbnailMap = {};
-    channelResponse.data.items.forEach(channel => {
-      channelThumbnailMap[channel.id] = channel.snippet.thumbnails.high?.url;
-    });
- 
+          
     const formattedDetails = searchResponse.data.items.map(item => {
       const videoId = item.id.videoId || '';
-      const stats = statsMap[videoId] || {};
-      const channelId = item.snippet.channelId;
-      const channelThumbnail = channelThumbnailMap[channelId];
+      const stats = statsMap[videoId] || {}; 
 
       return {
         videoId,
         thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
         title: item.snippet?.title || 'No Title',
-        channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
-        channelThumbnail,
-        channelInitial: !channelThumbnail ? item.snippet?.channelTitle?.charAt(0).toUpperCase() : null,
+        channelTitle: item.snippet?.channelTitle || 'Unknown Channel', 
+        channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
         viewCount: stats.viewCount || '0',
         likeCount: stats.likeCount || '0',

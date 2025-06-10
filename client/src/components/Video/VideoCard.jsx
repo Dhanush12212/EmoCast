@@ -32,8 +32,7 @@ function VideoCard() {
           });
         } else { 
           response = await axios.get(`${API_URL}/playlist/videos`);
-        }
-
+        } 
         setVideos(response.data.videos || []);
       } catch (error) {
         setError(error.response?.data?.message || 'Failed to fetch videos!!');
@@ -58,7 +57,7 @@ function VideoCard() {
 
   useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
-
+  
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
@@ -80,8 +79,7 @@ function VideoCard() {
                 thumbnailUrl,
                 title,
                 channelThumbnail,
-                channelTitle,
-                channelInitial,
+                channelTitle, 
                 viewCount,
                 publishDate,
               }) => (
@@ -104,21 +102,21 @@ function VideoCard() {
                   {/* Video Information */}
                   <div className="py-3 flex justify-between">
                     <div className="flex gap-3">
-                      <div className="h-14 w-14 flex justify-center items-center rounded-full overflow-hidden border border-red-400 shrink-0">
-                        {channelThumbnail ? (
+                      <div className="h-14 w-14 relative flex justify-center items-center rounded-full overflow-hidden border border-red-400 shrink-0 bg-gradient-to-tr from-gray-800 to-gray-900">
+                        {channelThumbnail && channelThumbnail !== '' ? (
                           <img
                             src={channelThumbnail}
                             alt={channelTitle}
-                            className="w-full h-full object-cover rounded"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-300 text-white font-semibold text-lg uppercase">
-                            {channelInitial}
-                          </div>
+                          <span className="absolute font-semibold text-2xl uppercase text-gray-300">
+                            {channelTitle?.charAt(0)}
+                          </span> 
                         )}
-                      </div> 
+                      </div>
                       <div>
-                        <h1 className="text-xl font-semibold leading-tight line-clamp-2">
+                        <h1 className="text-xl font-semibold leading-tight line-clamp-2"> 
                           {title}
                         </h1>
 
