@@ -14,8 +14,6 @@ import { CgProfile } from "react-icons/cg";
 import { AiOutlineDollar } from "react-icons/ai";  
 import { IoIosHelpCircleOutline } from "react-icons/io";
 
-export const filters = ["All","Gaming","Inventions","Computer programming","Kannada Cinema","CPUs","Music","Thrillers","Google","Mixes","Automobiles","Cricket","Live","Dramedy","Cars","Blogs","Technology","Fitness","Food","Travel","Education","Science","Health","Sports","Comedy","Motivation","DIY","Photography","Art","Fashion","Vlogs","News","Reviews","Unboxing","Animation","Short Films","Music Videos","Podcasts","Tech Reviews","Documentaries","Nature","Pets","Gaming Tutorials","ASMR","Self Improvement","Lifestyle","Meditation","Business","Finance","Gaming News"];
-
 export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/'},
   { icon: SiYoutubeshorts, label: "Shorts", path: '/' },

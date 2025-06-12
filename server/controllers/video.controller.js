@@ -14,6 +14,7 @@ const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 const RECOMMENDED_API_URL = process.env.RECOMMENDED_API_URL; 
 const SEARCH_API_URL = process.env.SEARCH_API_URL;
 const COMMENTS_API_URL = process.env.COMMENTS_API_URL;
+const CATEGORIES_API_URL = process.env.CATEGORIES_API_URL;
 
 //To display view count in k and M form
 function formatNumber(num) {
@@ -220,6 +221,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
     }
 });
 
+
 //Controller for Search Videos
 const searchVideos = asyncHandler(async (req, res) => {
   const { q } = req.query;
@@ -260,14 +262,14 @@ const searchVideos = asyncHandler(async (req, res) => {
       statsMap[item.id] = item.statistics;
     });
 
-    const channelIds = [...new Set(items.map(item => item.snippet.channelId))].join(',');
-    const channelResponse = await axios.get(CHANNELS_API_URL, {
-        params: {
-            part: 'snippet,statistics',
-            id: channelIds,
-            key: YOUTUBE_API_KEY,
-        },
-    });
+    // const channelIds = [...new Set(items.map(item => item.snippet.channelId))].join(',');
+    // const channelResponse = await axios.get(CHANNELS_API_URL, {
+    //     params: {
+    //         part: 'snippet,statistics',
+    //         id: channelIds,
+    //         key: YOUTUBE_API_KEY,
+    //     },
+    // });
           
     const formattedDetails = searchResponse.data.items.map(item => {
       const videoId = item.id.videoId || '';
@@ -280,9 +282,7 @@ const searchVideos = asyncHandler(async (req, res) => {
         channelTitle: item.snippet?.channelTitle || 'Unknown Channel', 
         channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
-        viewCount: stats.viewCount || '0',
-        likeCount: stats.likeCount || '0',
-        commentCount: stats.commentCount || '0',
+        viewCount: formatNumber(stats.viewCount || '0'), 
       };
     });
 
@@ -294,9 +294,38 @@ const searchVideos = asyncHandler(async (req, res) => {
 });
 
 
+//Fetching the Video Category array from the youtube endpoint
+const videoCategories  = asyncHandler(async(req, res) => {
+    try { 
+        
+        const categoryResponse = await axios.get(CATEGORIES_API_URL, {
+            params: {
+                part: 'snippet',
+                regionCode: 'IN',
+                key: YOUTUBE_API_KEY
+            }
+        })
+
+        const categories = categoryResponse.data.items
+        .filter(category => category.snippet.assignable)
+        .map(category => ({
+            id: category.id,
+            title: category.snippet.title
+        }));
+
+        res.status(200).json({ categories });
+    }
+    catch(error) {
+        console.log("Error Fetching the video category", error.message);
+        throw new ApiError(500, "Failed to Fetch the Videos Categories fro Youtube API");
+    }
+})
+
+
 export {
     fetchVideos,
     fetchSingleVideo,
-    searchVideos, 
+    searchVideos,
+    videoCategories,
 }
 

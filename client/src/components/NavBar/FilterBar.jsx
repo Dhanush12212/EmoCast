@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
-import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import { filters } from '../../constants';
+import React, { useRef, useState, useEffect } from 'react';
+import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'; 
+import axios from 'axios';
+import { API_URL } from '../../../config';
 
 function FilterBar() {
   const [tags, setTags] = useState([]);
@@ -8,9 +9,23 @@ function FilterBar() {
 
   const scroll = (direction) => {
     if (!scrollRef.current) return;
-    const amount = 200;  //200px
-    scrollRef.current.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+    const width = 200;  //200px
+    scrollRef.current.scrollBy({ left: direction === 'left' ? -width : width, behavior: 'smooth' });
   }; 
+
+  useEffect(() => {
+    const fetchCategories = async() => { 
+      try {
+        const response = await axios.get(`${API_URL}/playlist/category`); 
+        setTags(response.data.categories || [] ); 
+      } catch(error) {
+        console.log(error.response?.data?.message || 'Failed to fetch Categories!!');
+      }
+    }
+
+    fetchCategories();
+  }, [])
+    
 
   return (
     <div className="relative w-[96%] px-8 py-3 h-20 left-10 mt-20">
@@ -27,13 +42,13 @@ function FilterBar() {
         className="overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
       >
         <div className="inline-flex gap-3 items-center ">
-          {filters.map((name, idx) => (
+          {tags.map(({id, title}) => (
             <button
-              key={idx}
+              key={id}
               className={`snap-start whitespace-nowrap text-[#FEFEFE] px-4 py-2 rounded-lg text-lg font-medium
                  bg-[#272727]  hover:bg-[#3d3d3d] cursor-pointer`}
             >
-              {name}
+              {title}
             </button>
           ))}
         </div>
