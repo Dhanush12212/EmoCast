@@ -6,7 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../LoaderOrError';
 
-function VideoCard() {
+function VideoCard({ selectedCategory}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -15,10 +15,6 @@ function VideoCard() {
   const navigate = useNavigate();
   const { query } = useParams();   
 
-  const playVideo = (id) => {
-    navigate(`/videos/${id}`);
-  };
-
   useEffect(() => {
     const fetchVideos = async () => {
       setLoading(true);
@@ -26,13 +22,16 @@ function VideoCard() {
 
       try {
         let response;
-        if (query) { 
+        if (query) {
           response = await axios.get(`${API_URL}/searchVideos/search`, {
             params: { q: query }
           });
-        } else { 
+        } else if (selectedCategory) {
+          response = await axios.get(`${API_URL}/playlist/byCategory/${selectedCategory}` 
+          );
+        } else {
           response = await axios.get(`${API_URL}/playlist/videos`);
-        } 
+        }
         setVideos(response.data.videos || []);
       } catch (error) {
         setError(error.response?.data?.message || 'Failed to fetch videos!!');
@@ -42,7 +41,7 @@ function VideoCard() {
     };
 
     fetchVideos();
-  }, [query]);  
+  }, [query, selectedCategory]);  
 
   const handleMenuToggle = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
@@ -87,7 +86,7 @@ function VideoCard() {
                   key={videoId}
                   onClick={(e) => {
                     if (!e.target.closest('.menu-btn')) {
-                      playVideo(videoId);
+                      navigate(`/videos/${videoId}`);
                     }
                   }}
                   className="h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"

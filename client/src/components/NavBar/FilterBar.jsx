@@ -2,10 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'; 
 import axios from 'axios';
 import { API_URL } from '../../../config';
+import { useNavigate } from 'react-router-dom';
 
-function FilterBar() {
+function FilterBar({selectedCategory, onSelect}) {
   const [tags, setTags] = useState([]);
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
 
   const scroll = (direction) => {
     if (!scrollRef.current) return;
@@ -15,8 +17,8 @@ function FilterBar() {
 
   useEffect(() => {
     const fetchCategories = async() => { 
-      try {
-        const response = await axios.get(`${API_URL}/playlist/category`); 
+      try { 
+        let response = await axios.get(`${API_URL}/playlist/categories`); 
         setTags(response.data.categories || [] ); 
       } catch(error) {
         console.log(error.response?.data?.message || 'Failed to fetch Categories!!');
@@ -24,9 +26,9 @@ function FilterBar() {
     }
 
     fetchCategories();
-  }, [])
-    
-
+  }, []);
+ 
+     
   return (
     <div className="relative w-[96%] px-8 py-3 h-20 left-10 mt-20">
       
@@ -45,8 +47,13 @@ function FilterBar() {
           {tags.map(({id, title}) => (
             <button
               key={id}
-              className={`snap-start whitespace-nowrap text-[#FEFEFE] px-4 py-2 rounded-lg text-lg font-medium
-                 bg-[#272727]  hover:bg-[#3d3d3d] cursor-pointer`}
+              onClick={() => {
+                onSelect(id);
+                // navigate(`/videos?categoryId=${id}`);
+              }}
+              className={`snap-start whitespace-nowrap px-4 py-2 rounded-lg text-lg font-medium ${
+              selectedCategory === id ? 'bg-white text-black' : 'bg-[#272727] text-[#FEFEFE]'
+              } hover:bg-[#3d3d3d]`}
             >
               {title}
             </button>

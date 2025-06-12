@@ -18,7 +18,9 @@ function App() {
         <Route path='/login' element={<LoginPage/>} />   
         <Route path='/register' element={<RegisterPage/>} /> 
         <Route path='/videos/:id' element={ <VideoPage/> } />
-        <Route path="/search/:query" element={<LandingPage />} />
+        <Route path='/videos/category/:id' element={ <VideoPage/> } />
+        <Route path="/search/:query" element={<LandingPage />} /> 
+        
       </Routes>
     </Router> 
   )

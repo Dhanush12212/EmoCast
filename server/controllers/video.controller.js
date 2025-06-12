@@ -319,13 +319,51 @@ const videoCategories  = asyncHandler(async(req, res) => {
         console.log("Error Fetching the video category", error.message);
         throw new ApiError(500, "Failed to Fetch the Videos Categories fro Youtube API");
     }
-})
+});
 
+
+const getVideosByCategory = asyncHandler(async (req, res) => {
+  const { categoryId } = req.params;
+
+  if (!categoryId) {
+    throw new ApiError(400, "Category ID is required");
+  }
+
+  try {
+    const response = await axios.get(YOUTUBE_API_URL, {
+      params: {
+        part: 'snippet,statistics',
+        chart: 'mostPopular',
+        regionCode: 'US',
+        maxResults: 50,
+        videoCategoryId: categoryId,
+        key: YOUTUBE_API_KEY,
+      },
+    });
+
+    const formattedVideos = response.data.items.map((item) => ({
+      videoId: item.id,
+      thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
+      title: item.snippet?.title || 'No Title',
+      channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
+      channelThumbnail: item.snippet?.thumbnails?.default?.url || '',
+      publishDate: timeAgo(item.snippet?.publishedAt || ''),
+      viewCount: formatNumber(item.statistics?.viewCount || '0'),
+    }));
+
+    res.status(200).json({ videos: formattedVideos });
+  } catch (error) {
+    console.log("Error fetching category videos:", error.message);
+    throw new ApiError(500, 'Failed to fetch category videos');
+  }
+});
+ 
 
 export {
     fetchVideos,
     fetchSingleVideo,
     searchVideos,
     videoCategories,
+    getVideosByCategory,
 }
 
