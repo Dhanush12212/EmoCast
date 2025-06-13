@@ -296,15 +296,15 @@ const searchVideos = asyncHandler(async (req, res) => {
 
 //Fetching the Video Category array from the youtube endpoint
 const videoCategories  = asyncHandler(async(req, res) => {
-    try { 
-        
+    try {  
         const categoryResponse = await axios.get(CATEGORIES_API_URL, {
             params: {
                 part: 'snippet',
                 regionCode: 'IN',
+                maxResults:30,
                 key: YOUTUBE_API_KEY
             }
-        })
+        });
 
         const categories = categoryResponse.data.items
         .filter(category => category.snippet.assignable)
@@ -334,14 +334,20 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
       params: {
         part: 'snippet,statistics',
         chart: 'mostPopular',
-        regionCode: 'US',
+        regionCode: 'IN',
         maxResults: 50,
         videoCategoryId: categoryId,
         key: YOUTUBE_API_KEY,
       },
     });
 
-    const formattedVideos = response.data.items.map((item) => ({
+    const videos = response.data.items || [];
+
+    if (videos.length === 0) { 
+      throw new ApiError(400, "No videos found for this category");
+    }
+
+    const formattedVideos = videos.map((item) => ({
       videoId: item.id,
       thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
       title: item.snippet?.title || 'No Title',
@@ -351,14 +357,23 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
       viewCount: formatNumber(item.statistics?.viewCount || '0'),
     }));
 
-    res.status(200).json({ videos: formattedVideos });
-  } catch (error) {
-    console.log("Error fetching category videos:", error.message);
-    throw new ApiError(500, 'Failed to fetch category videos');
+    return res.status(200).json({ videos: formattedVideos });
+
+  } catch (error) { 
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+ 
+    if (error.response?.status === 404) {
+      return res.status(400).json({ message: "No videos found (404 from YouTube)" });
+    }
+
+    console.error("Unexpected error:", error.message);
+    return res.status(500).json({ message: "Failed to fetch category videos" });
   }
 });
  
-
+  
 export {
     fetchVideos,
     fetchSingleVideo,

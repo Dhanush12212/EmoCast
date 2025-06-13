@@ -6,7 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../LoaderOrError';
 
-function VideoCard({ selectedCategory}) {
+function VideoCard({ selectedCategory, category}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -27,8 +27,17 @@ function VideoCard({ selectedCategory}) {
             params: { q: query }
           });
         } else if (selectedCategory) {
-          response = await axios.get(`${API_URL}/playlist/byCategory/${selectedCategory}` 
-          );
+          try {
+            response = await axios.get(`${API_URL}/playlist/byCategory/${selectedCategory}`);
+          } catch(err) {
+            if(err.response.status === 400) {
+              response =  await axios.get(`${API_URL}/searchVideos/search`, {
+                params: {q: category}
+              });
+            } else {
+              throw err;
+            }
+          }
         } else {
           response = await axios.get(`${API_URL}/playlist/videos`);
         }

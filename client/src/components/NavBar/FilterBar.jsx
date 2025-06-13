@@ -1,13 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'; 
 import axios from 'axios';
-import { API_URL } from '../../../config';
-import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../../config'; 
 
 function FilterBar({selectedCategory, onSelect}) {
   const [tags, setTags] = useState([]);
-  const scrollRef = useRef(null);
-  const navigate = useNavigate();
+  const scrollRef = useRef(null); 
 
   const scroll = (direction) => {
     if (!scrollRef.current) return;
@@ -48,8 +46,7 @@ function FilterBar({selectedCategory, onSelect}) {
             <button
               key={id}
               onClick={() => {
-                onSelect(id);
-                // navigate(`/videos?categoryId=${id}`);
+                onSelect({id, title}); 
               }}
               className={`snap-start whitespace-nowrap px-4 py-2 rounded-lg text-lg font-medium ${
               selectedCategory === id ? 'bg-white text-black' : 'bg-[#272727] text-[#FEFEFE]'
