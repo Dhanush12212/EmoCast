@@ -28,7 +28,7 @@ function LandingPage() {
 
           {/* Home Feed */}
           <div className="pt-16 px-10"> 
-            <VideoCard selectedCategory={selectedCategory.id} category={selectedCategory.title}/>
+            <VideoCard selectedCategory={selectedCategory?.id} category={selectedCategory?.title}/>
           </div>
         </div>
       </div>

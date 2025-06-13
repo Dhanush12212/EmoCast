@@ -7,6 +7,7 @@ import LoginPage from './components/Authentication/LoginPage';
 import RegisterPage from './components/Authentication/RegisterPage';
 import VideoPage from './pages/VideoPage';
 import VideoCard from './components/Video/VideoCard';
+import ShortsPage from './pages/ShortsPage';
 
 function App() {
   return ( 
@@ -15,6 +16,7 @@ function App() {
         <Route path='/' element={<LandingPage/>} />   
         <Route path='/profile' element={<Profile/>} />   
         <Route path='/subscription' element={<Subscription/>} />   
+        <Route path='/shorts' element={<ShortsPage/>} />   
         <Route path='/login' element={<LoginPage/>} />   
         <Route path='/register' element={<RegisterPage/>} /> 
         <Route path='/videos/:id' element={ <VideoPage/> } />
