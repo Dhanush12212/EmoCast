@@ -28,7 +28,7 @@ function VideoCard({ selectedCategory, category}) {
           });
         } else if (selectedCategory) {
           try {
-            response = await axios.get(`${API_URL}/playlist/byCategory/${selectedCategory}`);
+            response = await axios.get(`${API_URL}/allVideos/byCategory/${selectedCategory}`);
           } catch(err) {
             if(err.response.status === 400) {
               response =  await axios.get(`${API_URL}/searchVideos/search`, {
@@ -39,7 +39,7 @@ function VideoCard({ selectedCategory, category}) {
             }
           }
         } else {
-          response = await axios.get(`${API_URL}/playlist/videos`);
+          response = await axios.get(`${API_URL}/allVideos/videos`);
         }
         setVideos(response.data.videos || []);
       } catch (error) {

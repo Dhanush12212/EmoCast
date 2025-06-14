@@ -278,15 +278,6 @@ const searchVideos = asyncHandler(async (req, res) => {
     statsResponse.data.items.forEach(item => {
       statsMap[item.id] = item.statistics;
     });
-
-    // const channelIds = [...new Set(items.map(item => item.snippet.channelId))].join(',');
-    // const channelResponse = await axios.get(CHANNELS_API_URL, {
-    //     params: {
-    //         part: 'snippet,statistics',
-    //         id: channelIds,
-    //         key: YOUTUBE_API_KEY,
-    //     },
-    // });
           
     const formattedDetails = searchResponse.data.items.map(item => {
       const videoId = item.id.videoId || '';
@@ -338,7 +329,7 @@ const videoCategories  = asyncHandler(async(req, res) => {
     }
 });
 
-
+//Fetch Category Videos
 const getVideosByCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
@@ -349,7 +340,7 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(YOUTUBE_API_URL, {
       params: {
-        part: 'snippet,statistics',
+        part: 'snippet,statistics,contentDetails',
         chart: 'mostPopular',
         regionCode: 'IN',
         maxResults: 50,
@@ -364,14 +355,18 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
       throw new ApiError(400, "No videos found for this category");
     }
 
-    const formattedVideos = videos.map((item) => ({
+    const formattedVideos = videos
+    .map((item) => ({
       videoId: item.id,
       thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
       title: item.snippet?.title || 'No Title',
       channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
       channelThumbnail: item.snippet?.thumbnails?.default?.url || '',
       publishDate: timeAgo(item.snippet?.publishedAt || ''),
-      viewCount: formatNumber(item.statistics?.viewCount || '0'),
+      viewCount: formatNumber(item.statistics?.viewCount || '0'), 
+      duration: item.contentDetails?.duration
+        ? parseDuration(item.contentDetails.duration)
+        : '0:00',
     }));
 
     return res.status(200).json({ videos: formattedVideos });
@@ -390,12 +385,56 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
   }
 });
  
-  
+const fetchShorts = asyncHandler(async (req, res) => {
+  try { 
+    const searchResponse = await axios.get(SEARCH_API_URL, {
+      params: {
+        part: 'snippet',
+        q: 'shorts',
+        type: 'video',
+        videoDuration: 'short',
+        maxResults: 20,
+        key: YOUTUBE_API_KEY,
+      },
+    });
+
+    const items = searchResponse.data.items;
+ 
+    const videoIds = items.map((item) => item.id.videoId).join(',');
+ 
+    const videosResponse = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+      params: {
+        part: 'snippet,statistics',
+        id: videoIds,
+        key: YOUTUBE_API_KEY,
+      },
+    });
+
+    const shorts = videosResponse.data.items.map((item) => ({
+      videoId: item.id,
+      title: item.snippet.title,
+      channelTitle: item.snippet.channelTitle,
+      description: item.snippet.description,
+      thumbnail: item.snippet.thumbnails.high.url,
+      likeCount: formatNumber(item.statistics.likeCount || '0'),
+      commentCount: formatNumber(item.statistics.commentCount || '0'),
+      viewCount: formatNumber(item.statistics.viewCount || '0'),
+    }));
+
+    res.status(200).json({ shorts });
+  } catch (error) {
+    console.error('Failed to fetch Shorts:', error.message);
+    throw new ApiError(500, 'Failed to fetch shorts');
+  }
+});
+
+ 
 export {
     fetchVideos,
     fetchSingleVideo,
     searchVideos,
     videoCategories,
     getVideosByCategory,
+    fetchShorts,
 }
 

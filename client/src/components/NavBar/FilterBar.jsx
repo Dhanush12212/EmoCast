@@ -16,7 +16,7 @@ function FilterBar({selectedCategory, onSelect}) {
   useEffect(() => {
     const fetchCategories = async() => { 
       try { 
-        let response = await axios.get(`${API_URL}/playlist/categories`); 
+        let response = await axios.get(`${API_URL}/allVideos/categories`); 
         setTags(response.data.categories || [] ); 
       } catch(error) {
         console.log(error.response?.data?.message || 'Failed to fetch Categories!!');

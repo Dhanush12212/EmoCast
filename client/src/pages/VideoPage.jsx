@@ -20,7 +20,7 @@ function VideoPage() {
       setError(null); 
 
       try {
-        const response = await axios.get(`${API_URL}/playlist/video/${id}`);
+        const response = await axios.get(`${API_URL}/allVideos/video/${id}`);
         setVideo(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch the video!!");

@@ -8,8 +8,7 @@ const LoaderOrError = ({ loading, error }) => {
         <p className="text-xl font-semibold text-gray-600">Loading Videos...</p>
       </div>
     );  
-  }
-
+  } 
 
   if (error) {
     return (

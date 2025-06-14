@@ -28,7 +28,7 @@ app.get('/', (req,res) => {
  
 
 app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/playlist', videoRoute);
+app.use('/api/v1/allVideos', videoRoute);
 app.use('/api/v1/searchVideos', searchRoute);
 
 const startServer = async() => {
