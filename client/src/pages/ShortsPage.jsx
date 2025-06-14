@@ -44,7 +44,7 @@ function ShortsPage() {
               <div className="relative w-[500px] max-w-[90%] h-[650px] bg-black rounded-xl shadow-lg overflow-hidden">
                <iframe
                   className="w-full h-full object-cover"
-                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=${videoId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3`}
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3`}
                   allow="autoplay; encrypted-media"
                   frameBorder="0"
                   allowFullScreen
