@@ -5,8 +5,7 @@ dotenv.config({
 
 import ApiError from "../utils/ApiError.utils.js" 
 import asyncHandler from "../utils/asyncHandler.utils.js";
-import axios from 'axios';
-import xml2js from 'xml2js';
+import axios from 'axios'; 
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_API_URL = process.env.YOUTUBE_API_URL;
@@ -52,12 +51,27 @@ function timeAgo(dateString) {
     return "just now";
 }  
 
+//Convert to ISO duration
+function parseDuration(isoDuration) {
+  const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+  const match = isoDuration.match(regex);
+
+  const hours = parseInt(match?.[1] || 0, 10);
+  const minutes = parseInt(match?.[2] || 0, 10);
+  const seconds = parseInt(match?.[3] || 0, 10);
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
 //Fetching Videos for the Home Page
 const fetchVideos = asyncHandler(async (req, res) => {
     try { 
         const response = await axios.get(YOUTUBE_API_URL, {
             params: {
-                part: 'snippet, statistics',
+                part: 'snippet,statistics,contentDetails',
                 chart: 'mostPopular',
                 regionCode: 'IN',
                 maxResults: 30,
@@ -88,8 +102,11 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
-            };
-        }); 
+                duration: item.contentDetails?.duration
+                      ? parseDuration(item.contentDetails.duration)
+                      : '0:00',                
+              };
+            });  
         
         //Sending the video response to the frontend 
         return res.status(200).json({ videos });

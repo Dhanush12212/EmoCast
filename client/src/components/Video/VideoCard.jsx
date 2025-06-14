@@ -90,6 +90,7 @@ function VideoCard({ selectedCategory, category}) {
                 channelTitle, 
                 viewCount,
                 publishDate,
+                duration,
               }) => (
                 <div
                   key={videoId}
@@ -100,12 +101,19 @@ function VideoCard({ selectedCategory, category}) {
                   }}
                   className="h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
                 >
-                  {/* Video Thumbnail */}
+                  {/* Video Thumbnail */} 
+                <div className="relative w-full h-[65%] rounded-t-2xl overflow-hidden">
                   <img
                     src={thumbnailUrl}
                     alt="video"
-                    className="w-full h-[65%] rounded-t-2xl object-cover"
+                    className="w-full h-full object-cover"
                   />
+                  {duration && (
+                    <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
+                      {duration}
+                    </span>
+                  )}
+                </div> 
 
                   {/* Video Information */}
                   <div className="py-3 flex justify-between">
@@ -116,7 +124,7 @@ function VideoCard({ selectedCategory, category}) {
                             src={channelThumbnail}
                             alt={channelTitle}
                             className="w-full h-full object-cover"
-                          />
+                            /> 
                         ) : (
                           <span className="absolute font-semibold text-2xl uppercase text-gray-300">
                             {channelTitle?.charAt(0)}
@@ -125,8 +133,8 @@ function VideoCard({ selectedCategory, category}) {
                       </div>
                       <div>
                         <h1 className="text-xl font-semibold leading-tight line-clamp-2"> 
-                          {title}
-                        </h1>
+                          {title} 
+                        </h1> 
 
                         <p className="text-lg text-gray-400 mt-2">{channelTitle}</p>
                         <div className="flex gap-3 text-lg text-gray-400">
