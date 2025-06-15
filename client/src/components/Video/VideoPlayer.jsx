@@ -39,20 +39,20 @@ function MainVideoSection({ video }) {
   return (
     <div
       key={videoId}
-      className="w-full md:w-[70%] h-full flex flex-col gap-6 overflow-auto md:mb-10 p-3"
+      className="w-full md:w-[70%] h-full flex flex-col gap-3 overflow-auto md:mb-10 px-3 py-2"
     >
       {/* Video Player */}
-      <div className="w-full h-[80vh]">
-        <iframe
-          width="100%"
-          height="438"
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`} 
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        ></iframe>
-      </div>
+      <div className="w-full aspect-video">
+      <iframe
+        className="w-full h-[100%]"
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`}
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+      ></iframe>
+    </div>
+
 
       {/* Title */}
       <h1 className="text-2xl font-bold">{title}</h1>
@@ -122,11 +122,16 @@ function MainVideoSection({ video }) {
         <h1 className='text-3xl font-bold'>{commentsCount} Comments</h1>
         {video.comments?.map(({author, commentThumbnail, publishedAt, likeCount, text}) => (
           <div key={author} className='flex gap-5 py-1'>
-            <img
-              src={commentThumbnail}
-              alt="Profile"
-              className="h-12 w-12 rounded-full object-cover cursor-pointer"
-            />
+            {commentThumbnail && commentThumbnail !== '' ? (
+              <img
+                src={commentThumbnail} 
+                className="h-14 w-14 rounded-full object-cover cursor-pointer"
+                /> 
+            ) : (
+              <span className="absolute font-semibold text-2xl uppercase text-gray-300">
+                {author?.charAt(0)}
+              </span> 
+          )}
             <div className='flex flex-col gap-1 py-1'>
               <div className='flex gap-2 items-center'>
                 <p className='text-lg'>{author}</p>
