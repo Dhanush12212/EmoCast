@@ -28,11 +28,11 @@ function Profile() {
                 alt="Profile"
                 className="h-14 w-14 rounded-full object-cover cursor-pointer mt-2"
             />
-            <div className='text-xl font-semibold'>
+            <Link  to='/profile' className='text-xl font-semibold'>
                 <h1>Dhanush</h1>
                 <p>@dhanushmogaveer1221</p>
                 <p className='text-blue-500 mt-3 cursor-pointer'>View your channel</p>
-            </div>
+            </Link>
         </div>
 
         <div className='p-3 text-xl flex flex-col '>

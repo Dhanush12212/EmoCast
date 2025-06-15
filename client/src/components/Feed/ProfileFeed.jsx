@@ -3,11 +3,12 @@ import { MdOutlineSwitchAccount } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa"; 
 import { assets } from '../../assets/assets';
 import SampleVideo from '../SampleVideo';
+import { Link } from 'react-router-dom'
 
 function ProfileFeed() {
  
   return (
-    <div className='px-2 flex flex-col gap-10'>
+    <div className='p-6 flex flex-col gap-10'>
         <div className='h-full px-10 w-full flex gap-6 '> 
         <div className="flex justify-center items-center">
             <img src={assets.Subscription} alt="Subscription Icon" className="h-40 w-40 p-1 bg-white rounded-full" />
@@ -20,14 +21,14 @@ function ProfileFeed() {
                     <p>view channel</p>
                 </div>
                 <div className='flex gap-6'>
-                    <button className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
+                    <Link to='/register' className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
                         <MdOutlineSwitchAccount className='h-5 w-5'/>
-                        <label htmlFor="">Switch Acount</label>
-                    </button>
-                    <button className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
+                        <span>Switch Acount</span>
+                    </Link>
+                    <Link to='/login' className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
                         <FaGoogle className='h-5 w-5'/>
-                        <label htmlFor="">Google account</label>
-                    </button> 
+                        <span>Google account</span>
+                    </Link> 
                 </div>
             </div> 
         </div>

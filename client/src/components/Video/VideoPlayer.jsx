@@ -39,7 +39,7 @@ function MainVideoSection({ video }) {
   return (
     <div
       key={videoId}
-      className="w-full md:w-[65%] h-full flex flex-col gap-6 overflow-auto md:mb-10 p-3"
+      className="w-full md:w-[70%] h-full flex flex-col gap-6 overflow-auto md:mb-10 p-3"
     >
       {/* Video Player */}
       <div className="w-full h-[80vh]">
@@ -50,7 +50,7 @@ function MainVideoSection({ video }) {
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen='True'
+          allowFullScreen
         ></iframe>
       </div>
 
@@ -60,11 +60,16 @@ function MainVideoSection({ video }) {
       {/* Channel & Actions */}
       <div className="flex items-center justify-between flex-wrap gap-4 cursor-pointer">
         <div className="flex items-center gap-4">
-          <img
-            src={channelThumbnailUrl}
-            alt="Profile"
-            className="h-14 w-14 rounded-full object-cover cursor-pointer"
-          />
+          {channelThumbnailUrl && channelThumbnailUrl !== '' ? (
+              <img
+                src={channelThumbnailUrl} 
+                className="h-14 w-14 rounded-full object-cover cursor-pointer"
+                /> 
+            ) : (
+              <span className="absolute font-semibold text-2xl uppercase text-gray-300">
+                {channelTitle?.charAt(0)}
+              </span> 
+          )}
           <div>
             <h2 className="text-lg font-semibold">{channelTitle}</h2>
             <p className="text-md text-gray-400">{subscribers} subscribers</p>
@@ -115,7 +120,7 @@ function MainVideoSection({ video }) {
       {/* Comments */}
       <div className='flex-col gap-10 px-3 hidden md:flex'>
         <h1 className='text-3xl font-bold'>{commentsCount} Comments</h1>
-        {video.comments.map(({author, commentThumbnail, publishedAt, likeCount, text}) => (
+        {video.comments?.map(({author, commentThumbnail, publishedAt, likeCount, text}) => (
           <div key={author} className='flex gap-5 py-1'>
             <img
               src={commentThumbnail}

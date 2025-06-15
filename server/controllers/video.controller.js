@@ -211,6 +211,9 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
                 channelTitle: item.snippet.channelTitle,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'), 
+                duration: item.contentDetails?.duration
+                  ? parseDuration(item.contentDetails.duration)
+                  : '0:00'
             };
         });
 
@@ -373,7 +376,7 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
       viewCount: formatNumber(item.statistics?.viewCount || '0'), 
       duration: item.contentDetails?.duration
         ? parseDuration(item.contentDetails.duration)
-        : '0:00',
+        : '0:00'
     }));
 
     return res.status(200).json({ videos: formattedVideos });
