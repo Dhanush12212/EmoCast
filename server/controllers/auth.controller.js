@@ -56,15 +56,17 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //Auth for Logout
-const logoutUser = asyncHandler( async( req,res) => {
-    res.clearCookie( "token", {
+const logoutUser = async (req, res) => { 
+    res.cookie("token", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    });
-
-    return res.status(200).send( new ApiResponse( 200, "Logout Successufully"));
-});
+        expires: new Date(0),
+        path: "/", 
+      });
+      res.clearCookie("token"); 
+    return res.status(200).json({ message: "Logout successful" });
+};
 
 //Auth for checking the Log
 const checkLog = asyncHandler( async(req, res, next) => {

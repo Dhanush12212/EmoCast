@@ -238,7 +238,6 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
     }
 });
 
-
 //Controller for Search Videos
 const searchVideos = asyncHandler(async (req, res) => {
   const { q } = req.query;
@@ -246,8 +245,7 @@ const searchVideos = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Search query is required');
   }
 
-  try {
-    //Fetch Search videos
+  try { 
     const searchResponse = await axios.get(SEARCH_API_URL, {
       params: {
         part: 'snippet',
@@ -257,50 +255,59 @@ const searchVideos = asyncHandler(async (req, res) => {
         key: YOUTUBE_API_KEY,
       },
     });
-    const items = searchResponse.data.items;
 
-    const videoIds = searchResponse.data.items.map(item => item.id.videoId).filter(Boolean);
+    const searchItems = searchResponse.data.items;
+    const videoIds = searchItems.map(item => item.id.videoId).filter(Boolean);
 
     if (videoIds.length === 0) {
       return res.status(200).json({ videos: [] });
     }
-
-    //Fetch statistics for these video IDs
+ 
     const statsResponse = await axios.get(YOUTUBE_API_URL, {
       params: {
-        part: 'statistics',
+        part: 'statistics,contentDetails',
         id: videoIds.join(','),
         key: YOUTUBE_API_KEY,
       },
     });
- 
+
     const statsMap = {};
     statsResponse.data.items.forEach(item => {
-      statsMap[item.id] = item.statistics;
+      statsMap[item.id] = {
+        statistics: item.statistics,
+        contentDetails: item.contentDetails,
+      };
     });
-          
-    const formattedDetails = searchResponse.data.items.map(item => {
-      const videoId = item.id.videoId || '';
-      const stats = statsMap[videoId] || {}; 
+
+    const formattedDetails = searchItems.map(item => {
+      const videoId = item.id.videoId;
+      const statDetail = statsMap[videoId] || {};
+      const stats = statDetail.statistics || {};
+      const contentDetails = statDetail.contentDetails || {};
 
       return {
         videoId,
         thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
         title: item.snippet?.title || 'No Title',
-        channelTitle: item.snippet?.channelTitle || 'Unknown Channel', 
-        channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+        channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
+        channelThumbnail:
+          item.snippet?.thumbnails?.high?.url ||
+          item.snippet?.thumbnails?.medium?.url ||
+          item.snippet?.thumbnails?.default?.url,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
-        viewCount: formatNumber(stats.viewCount || '0'), 
+        viewCount: formatNumber(stats.viewCount || '0'),
+        duration: contentDetails.duration
+          ? parseDuration(contentDetails.duration)
+          : '0:00',
       };
     });
 
     res.status(200).json({ videos: formattedDetails });
   } catch (error) {
-    console.log("Error Searching Videos", error.message);
+    console.log('Error Searching Videos', error.message);
     throw new ApiError(500, 'Failed to Fetch the videos from Youtube API');
   }
-});
-
+}); 
 
 //Fetching the Video Category array from the youtube endpoint
 const videoCategories  = asyncHandler(async(req, res) => {
