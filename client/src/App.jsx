@@ -8,12 +8,14 @@ import RegisterPage from './components/Authentication/RegisterPage';
 import VideoPage from './pages/VideoPage';
 import VideoCard from './components/Video/VideoCard';
 import ShortsPage from './pages/ShortsPage';
+import AuthorProfile from './pages/AuthorProfile';
 
 function App() {
   return ( 
     <Router>
       <Routes>
-        <Route path='/' element={<LandingPage/>} />   
+        <Route path='/' element={<AuthorProfile/>} />   
+        {/* <Route path='/' element={<LandingPage/>} />    */}
         <Route path='/profile' element={<Profile/>} />   
         <Route path='/subscription' element={<Subscription/>} />   
         <Route path='/shorts' element={<ShortsPage/>} />   
