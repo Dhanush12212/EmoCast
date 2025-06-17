@@ -53,23 +53,23 @@ function AuthorProfile() {
             </div>
 
             {/* Main Content */}
+            {channel && (
             <div className="flex w-full ml-25 overflow-x-hidden  flex-col gap-5">    
-              <div className='flex justify-center'>
-
-                <img className="w-[80%] h-64 rounded-2xl" src={assets.banner} alt="YouTube Logo" /> 
+              <div  className='flex justify-center'>
+                <img className="w-[80%] h-64 rounded-2xl" src={channel.banner} alt="YouTube Logo" /> 
               </div>
 
                 <div className="flex gap-10 p-2 ml-20 items-center">
-                  <img src={assets.Subscription} alt="Subscription Icon" className="h-56 w-56 p-1 rounded-full" />
+                  <img src={channel.thumbnail} alt="Subscription Icon" className="h-56 w-56 p-1 rounded-full" />
 
                   <div className='flex flex-col gap-3'>
-                    <h1 className='font-bold text-5xl'>College Wallah</h1>  
+                    <h1 className='font-bold text-5xl'>{channel.title}</h1>  
                     <div className='flex gap-2 text-xl'>
-                      <h1 className='font-semibold text-white'>@Collegewallah</h1> &bull;
-                      <p>878K Subscribers</p> &bull;
-                      <p>1.2K videos</p>
+                      <h1 className='font-semibold text-white'>@{channel.title}</h1> &bull;
+                      <p>{channel.subscribers} Subscribers</p> &bull;
+                      <p>{channel.videos} videos</p>
                     </div>
-                    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque laudanti ae ratione voluptates   obcaecati odit? Cum!</p>
+                    <p>{channel.description}</p>
                     <button className='px-2 py-2 bg-white rounded-full border w-32 text-black font-medium text-lg cursor-pointer'>Subscribe</button>
                   </div>
                 </div>
@@ -77,6 +77,7 @@ function AuthorProfile() {
                   <h1 className='text-3xl font-semibold ml-15'>Videos</h1>
                   <SampleVideo/>
             </div>
+            )}
           </div>
         </div>
       )}
