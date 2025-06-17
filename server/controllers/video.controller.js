@@ -10,7 +10,7 @@ import axios from 'axios';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_API_URL = process.env.YOUTUBE_API_URL;
 const CHANNELS_API_URL = process.env.CHANNELS_API_URL; 
-const RECOMMENDED_API_URL = process.env.RECOMMENDED_API_URL; 
+// const RECOMMENDED_API_URL = process.env.RECOMMENDED_API_URL; 
 const SEARCH_API_URL = process.env.SEARCH_API_URL;
 const COMMENTS_API_URL = process.env.COMMENTS_API_URL;
 const CATEGORIES_API_URL = process.env.CATEGORIES_API_URL;
@@ -90,9 +90,11 @@ const fetchVideos = asyncHandler(async (req, res) => {
         if (videoIds.length === 0) {
             throw new ApiError(404, "No valid video IDs found");
         }
+
         
         const videos = response.data.items.map(item => {  
-
+          const channelId = item.snippet.channelId; 
+          
             return {
                 videoId: item.id?.videoId || item.id?.playlistId || item.id?.channelId || item.id || '',
                 thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
@@ -104,7 +106,8 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
                 duration: item.contentDetails?.duration
                       ? parseDuration(item.contentDetails.duration)
-                      : '0:00',                
+                      : '0:00',    
+                channelId,
               };
             });  
         

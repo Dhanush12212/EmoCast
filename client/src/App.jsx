@@ -5,8 +5,7 @@ import Profile from './pages/ProfilePage';
 import Subscription from './pages/Subscription';
 import LoginPage from './components/Authentication/LoginPage';
 import RegisterPage from './components/Authentication/RegisterPage';
-import VideoPage from './pages/VideoPage';
-import VideoCard from './components/Video/VideoCard';
+import VideoPage from './pages/VideoPage'; 
 import ShortsPage from './pages/ShortsPage';
 import AuthorProfile from './pages/AuthorProfile';
 
@@ -14,8 +13,8 @@ function App() {
   return ( 
     <Router>
       <Routes>
-        <Route path='/' element={<AuthorProfile/>} />   
-        {/* <Route path='/' element={<LandingPage/>} />    */}
+        <Route path='/' element={<LandingPage/>} />   
+        <Route path='/channel/:channelId' element={<AuthorProfile/>} />   
         <Route path='/profile' element={<Profile/>} />   
         <Route path='/subscription' element={<Subscription/>} />   
         <Route path='/shorts' element={<ShortsPage/>} />   

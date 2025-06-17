@@ -91,6 +91,7 @@ function VideoCard({ selectedCategory, category}) {
                 viewCount,
                 publishDate,
                 duration,
+                channelId
               }) => (
                 <div
                   key={videoId}
@@ -124,9 +125,18 @@ function VideoCard({ selectedCategory, category}) {
                             src={channelThumbnail}
                             alt={channelTitle}
                             className="w-full h-full object-cover"
+                            onClick={(e) => { 
+                              e.stopPropagation();
+                              navigate(`/channel/${channelId}`); 
+                            }}
                             /> 
                         ) : (
-                          <span className="absolute font-semibold text-2xl uppercase text-gray-300">
+                          <span 
+                            className="absolute font-semibold text-2xl uppercase text-gray-300">
+                            e.stopPropagation();
+                            onClick={(e) => { 
+                              navigate(`/channel/${channelId}`); 
+                            }}  
                             {channelTitle?.charAt(0)}
                           </span> 
                         )}

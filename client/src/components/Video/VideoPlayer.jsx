@@ -137,7 +137,7 @@ function MainVideoSection({ video }) {
                 <p className='text-lg'>{author}</p>
                 <span className='text-[#999595]'>{publishedAt}</span>
               </div>
-              <p className='text-xl'>{text}</p>
+              <p className='text-xl'>{linkify(text)}</p>
               <div className='flex gap-5'>
                 <div className='flex gap-2'>
                   <SlLike className='w-5 h-5 cursor-pointer'/>
