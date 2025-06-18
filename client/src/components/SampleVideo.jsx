@@ -10,8 +10,7 @@ function SampleVideo() {
         time: "3 weeks ago"
       });
 
-  return ( 
-    <div>
+  return (  
       <div className="flex flex-wrap justify-around gap-4 mt-5 px-6">
           {videos.map((video, index) => (
           <div
@@ -44,8 +43,7 @@ function SampleVideo() {
               </div>
           </div>
           ))}
-       </div>
-        </div>
+       </div> 
   )
 }
 

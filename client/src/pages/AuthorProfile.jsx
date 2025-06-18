@@ -82,7 +82,30 @@ function AuthorProfile() {
 
               {/* Videos Section */}
               <h2 className="text-3xl font-semibold mb-4 text-gray-400">Videos</h2>
-              <SampleVideo />
+              <div className="flex flex-wrap justify-around gap-4 mt-5 px-6">
+                {channel.videos.map((video, index) => (
+                  <div
+                    key={video.videoId}
+                    className="w-full sm:w-[48%] lg:w-[32%] xl:w-[30%] h-[300px]  rounded-2xl flex flex-col shadow-md cursor-pointer"
+                  >
+                    {/* Video Thumbnail */}
+                    <img
+                      src={video.thumbnailUrl}
+                      alt="video"
+                      className="w-full h-[65%] rounded-t-2xl object-cover"
+                    />
+                    {/* Video Info */}
+                      <div className="flex gap-3 p-3">  
+                        <h1 className="text-xl font-semibold leading-tight">{video.title}</h1>
+                        <p className="text-md text-gray-400 mt-2">{video.viewCount}</p>
+                        <div className="flex gap-4 text-md text-gray-400">
+                          <p>{video.publishDate}</p>
+                          <p></p>
+                        </div> 
+                      </div>
+                  </div>
+                ))}
+              </div> 
             </div>
           </div>
         </div>

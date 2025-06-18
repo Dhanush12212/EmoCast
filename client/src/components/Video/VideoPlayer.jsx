@@ -83,7 +83,10 @@ function VideoPlayer({ video }) {
               {channelTitle?.charAt(0)}
             </span>  
           )}
-          <div>
+          <div 
+            onClick={() => { 
+              navigate(`/channel/${channelId}`); 
+            }} >
             <h2 className="text-lg font-semibold">{channelTitle}</h2>
             <p className="text-md text-gray-400">{subscribers} subscribers</p>
           </div>
