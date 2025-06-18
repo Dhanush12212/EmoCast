@@ -18,23 +18,28 @@ function RecommendedVideo({ videos = [] }) {
 
   return (
     <div className="flex flex-col gap-6 mt-4 px-3">
-      {videos.map(({videoId, thumbnailUrl, title, channelTitle, viewCount, publishDate, duration}) => (
+      {videos.map(({ videoId, thumbnailUrl, title, channelTitle, viewCount, publishDate, duration }) => (
         <div
           key={videoId}
+          role="button"
+          tabIndex={0}
           onClick={() => playVideo(videoId)}
+          onKeyDown={(e) => e.key === 'Enter' && playVideo(videoId)}
           className="flex items-start gap-4 cursor-pointer hover:bg-[#2a2a2a] transition duration-200 rounded-xl p-2"
         >
-          {/* Thumbnail */}
-          <img
-            src={thumbnailUrl}
-            alt={title || "Video thumbnail"}
-            className="w-52 h-32 rounded-xl object-cover flex-shrink-0"
-          />
-          {duration && (
-            <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
-              {duration}
-            </span>
-          )}
+          {/* Thumbnail + Duration */}
+          <div className="relative w-52 h-32 flex-shrink-0">
+            <img
+              src={thumbnailUrl}
+              alt={title || "Video thumbnail"}
+              className="w-full h-full rounded-xl object-cover"
+            />
+            {duration && (
+              <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
+                {duration}
+              </span>
+            )}
+          </div>
 
           {/* Info */}
           <div className="flex flex-col justify-between">

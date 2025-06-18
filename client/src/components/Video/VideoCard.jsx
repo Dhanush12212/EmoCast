@@ -103,7 +103,7 @@ function VideoCard({ selectedCategory, category}) {
                   className="h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
                 >
                   {/* Video Thumbnail */} 
-                <div className="relative w-full h-[65%] rounded-t-2xl overflow-hidden">
+                <div className="relative w-full h-[100%] rounded-t-2xl overflow-hidden">
                   <img
                     src={thumbnailUrl}
                     alt="video"
@@ -158,7 +158,7 @@ function VideoCard({ selectedCategory, category}) {
                     {/* More Options */}
                     <div className="relative">
                       <button onClick={() => handleMenuToggle(videoId)} className="menu-btn">
-                        <MoreVertIcon style={{ fontSize: '25px', cursor: 'pointer' }} />
+                        <MoreVertIcon style={{ fontSize: '25px', cursor: 'pointer', zIndex: 10 }} />
                       </button>
 
                       {openMenuId === videoId && (

@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { SlLike, SlDislike } from "react-icons/sl";
 import { RiShareForwardLine } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
+import { useNavigate } from 'react-router-dom';
 
-function MainVideoSection({ video }) {
+function VideoPlayer({ video }) {
+  const navigate = useNavigate();
   const [isMore, setIsMore] = useState(false);
   const {
     videoId, 
     title,
+    channelId,
     channelThumbnailUrl,
     channelTitle,
     subscribers,
@@ -19,8 +22,9 @@ function MainVideoSection({ video }) {
   } = video || {};
 
   const linkify = (text) => {
+  const cleanedText = text.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1');
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.split('\n').map((line, i) => (
+  return cleanedText.split('\n').map((line, i) => (
     <React.Fragment key={i}>
       {line.split(urlRegex).map((part, j) =>
         urlRegex.test(part) ? (
@@ -45,8 +49,7 @@ function MainVideoSection({ video }) {
       <div className="w-full aspect-video">
       <iframe
         className="w-full h-[100%]"
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`}
-        frameborder="0"
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`} 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen
@@ -61,14 +64,24 @@ function MainVideoSection({ video }) {
       <div className="flex items-center justify-between flex-wrap gap-4 cursor-pointer">
         <div className="flex items-center gap-4">
           {channelThumbnailUrl && channelThumbnailUrl !== '' ? (
-              <img
-                src={channelThumbnailUrl} 
-                className="h-14 w-14 rounded-full object-cover cursor-pointer"
-                /> 
-            ) : (
-              <span className="absolute font-semibold text-2xl uppercase text-gray-300">
-                {channelTitle?.charAt(0)}
-              </span> 
+            <img
+              src={channelThumbnailUrl}
+              alt={channelTitle}
+              className="h-14 w-14 rounded-full object-cover cursor-pointer"
+              onClick={(e) => { 
+                e.stopPropagation();
+                navigate(`/channel/${channelId}`); 
+              }}
+              /> 
+          ) : (
+            <span 
+              className="absolute font-semibold text-2xl uppercase text-gray-300">
+              e.stopPropagation();
+              onClick={(e) => { 
+                navigate(`/channel/${channelId}`); 
+              }}  
+              {channelTitle?.charAt(0)}
+            </span>  
           )}
           <div>
             <h2 className="text-lg font-semibold">{channelTitle}</h2>
@@ -84,7 +97,7 @@ function MainVideoSection({ video }) {
             <SlLike className="w-6 h-6" /> {likeCount}
           </div>
           <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full cursor-pointer ">
-            <SlDislike className="w-6 h-6" />
+            <SlDislike className="w-6 h-6" /> {}
           </div>
           <div className="flex items-center gap-2 bg-[#252728] px-4 py-2 rounded-full cursor-pointer ">
             <RiShareForwardLine className="w-6 h-6" />
@@ -98,7 +111,7 @@ function MainVideoSection({ video }) {
       </div>
 
       {/* Description */}
-      <div className="w-full p-4 rounded-2xl font-semibold bg-gradient-to-b from-[#333333] to-[#272727] text-xl flex flex-col gap-5 transition-all duration-300">
+      <div className="w-full p-5 mt-5 rounded-2xl font-semibold bg-gradient-to-b from-[#333333] to-[#272727] text-xl flex flex-col gap-5 transition-all duration-300">
         <div className='flex gap-3'>
           <p>{viewCount} views</p>
           <p>{publishDate}</p>
@@ -118,10 +131,10 @@ function MainVideoSection({ video }) {
       </div>
 
       {/* Comments */}
-      <div className='flex-col gap-10 px-3 hidden md:flex'>
+      <div className='flex-col gap-10 px-3 py-2 hidden md:flex'>
         <h1 className='text-3xl font-bold'>{commentsCount} Comments</h1>
-        {video.comments?.map(({author, commentThumbnail, publishedAt, likeCount, text}) => (
-          <div key={author} className='flex gap-5 py-1'>
+        {video.comments?.map(({author, commentThumbnail, publishedAt, likeCount, text}, index) => (
+          <div key={`${videoId}-${index}`} className='flex gap-5 py-1'>
             {commentThumbnail && commentThumbnail !== '' ? (
               <img
                 src={commentThumbnail} 
@@ -153,4 +166,4 @@ function MainVideoSection({ video }) {
   );
 }
 
-export default MainVideoSection;
+export default VideoPlayer;

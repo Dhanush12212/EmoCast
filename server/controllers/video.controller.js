@@ -5,6 +5,7 @@ dotenv.config({
 
 import ApiError from "../utils/ApiError.utils.js" 
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import { formatNumber, timeAgo, parseDuration } from '../utils/Formatters.utils.js';
 import axios from 'axios'; 
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -14,57 +15,6 @@ const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 const SEARCH_API_URL = process.env.SEARCH_API_URL;
 const COMMENTS_API_URL = process.env.COMMENTS_API_URL;
 const CATEGORIES_API_URL = process.env.CATEGORIES_API_URL;
-
-//To display view count in k and M form
-function formatNumber(num) {
-    if (num >= 1e6) {
-        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + "M ";
-    }
-    if (num >= 1e3) {
-        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + "K ";
-    }
-    return num.toString();
-}
-
-//Converting time stamp 
-function timeAgo(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    const intervals = [
-        { label: "year", seconds: 31536000 },
-        { label: "month", seconds: 2592000 },
-        { label: "week", seconds: 604800 },
-        { label: "day", seconds: 86400 },
-        { label: "hour", seconds: 3600 },
-        { label: "minute", seconds: 60 },
-        { label: "second", seconds: 1 },
-    ];
-
-    for (const interval of intervals) {
-        const count = Math.floor(seconds / interval.seconds);
-        if (count >= 1) {
-            return `${count} ${interval.label}${count > 1 ? 's' : ''} ago`;
-        }
-    }
-    return "just now";
-}  
-
-//Convert to ISO duration
-function parseDuration(isoDuration) {
-  const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
-  const match = isoDuration.match(regex);
-
-  const hours = parseInt(match?.[1] || 0, 10);
-  const minutes = parseInt(match?.[2] || 0, 10);
-  const seconds = parseInt(match?.[3] || 0, 10);
-
-  if (hours > 0) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
-}
 
 //Fetching Videos for the Home Page
 const fetchVideos = asyncHandler(async (req, res) => {
@@ -96,7 +46,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
           const channelId = item.snippet.channelId; 
           
             return {
-                videoId: item.id?.videoId || item.id?.playlistId || item.id?.channelId || item.id || '',
+                videoId: item.id || '',
                 thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
                 title: item.snippet?.title || "No title",
                 description: item.snippet?.description || "No description available",
@@ -175,7 +125,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
          
        const recommendedResponse = await axios.get(YOUTUBE_API_URL, {
            params: {
-               part: 'snippet,statistics',  
+               part: 'snippet,statistics,contentDetails',  
                chart: 'mostPopular',
                regionCode: 'US',
                maxResults: 20,
@@ -215,7 +165,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'), 
                 duration: item.contentDetails?.duration
-                  ? parseDuration(item.contentDetails.duration)
+                  ? parseDuration(item.contentDetails?.duration)
                   : '0:00'
             };
         });
@@ -227,6 +177,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
             description: item.snippet?.description || "No description found",
             channelTitle: item.snippet?.channelTitle || "Unknown Channel",
             channelThumbnailUrl: channel.snippet?.thumbnails?.high?.url || '',
+            channelId: item.snippet.channelId,
             publishDate: timeAgo(item.snippet?.publishedAt || ''),
             viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
             likeCount: formatNumber(item.statistics?.likeCount ?? '0'),

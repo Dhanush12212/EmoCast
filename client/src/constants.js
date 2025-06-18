@@ -5,7 +5,7 @@ import { AiOutlineLike } from "react-icons/ai";
 
 export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/'},
-  { icon: SiYoutubeshorts, label: "Shorts", path: '/' },
+  { icon: SiYoutubeshorts, label: "Shorts", path: '/shorts' },
   { icon: MdOutlineSubscriptions, label: "Subscription", path: '/subscription' },  
   { icon: MdOutlineWatchLater, label: "Watch Later", path: '/profile' }, 
   { icon: AiOutlineLike, label: "Liked Videos", path: '/profile' },     
