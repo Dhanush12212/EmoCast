@@ -8,6 +8,7 @@ import authRoute from './routes/auth.routes.js';
 import videoRoute from './routes/video.routes.js';
 import searchRoute from './routes/search.routes.js';
 import channelRoute from './routes/channel.route.js';
+import watchLaterRoute from './routes/watchLater.route.js';
 import cors from 'cors';
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/allVideos', videoRoute);
 app.use('/api/v1/searchVideos', searchRoute);
 app.use('/api/v1/channel', channelRoute);
+app.use('/api/v1/watchLater', watchLaterRoute);
 
 const startServer = async() => {
     try{

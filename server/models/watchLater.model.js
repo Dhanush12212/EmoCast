@@ -1,24 +1,13 @@
 import mongoose, { Schema } from 'mongoose';
 
-const playlistSchema = new Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-      default: 'No description provided.',
-    },
+const watchLaterSchema = new Schema(
+{
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',  
+      ref: 'User',
       required: true,
     },
-    videos: [
-      {
+    video: {
         videoId: {
           type: String,  
           required: true,
@@ -33,6 +22,15 @@ const playlistSchema = new Schema(
         thumbnail: {
           type: String,  
         },
+        cahnnelThumbnail: {
+          type: String,  
+        },
+        channelTitle: {
+          type: String,  
+        },
+        channelId: {
+          type: String,  
+        },
         publishedAt: {
           type: Date, 
         },
@@ -40,8 +38,7 @@ const playlistSchema = new Schema(
           type: Date,
           default: Date.now,  
         },
-      },
-    ],
+      }, 
     createdAt: {
       type: Date,
       default: Date.now,
@@ -56,4 +53,4 @@ const playlistSchema = new Schema(
   }
 );
  
-export const Playlist = mongoose.model('Playlist', playlistSchema); 
+export const watchLater = mongoose.model('watchLater', watchLaterSchema); 
