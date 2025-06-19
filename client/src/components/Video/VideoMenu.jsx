@@ -11,13 +11,18 @@ const menuItemClasses = "flex gap-3 hover:bg-[#535353] cursor-pointer w-full px-
 function VideoMenu() {
   return (
     <div className="w-72 bg-[#282828] rounded-lg text-[#F1F1F1] text-lg font-medium py-2 shadow-lg">
-      <div className={menuItemClasses}>
+      <div 
+        className={menuItemClasses}
+        onClick={(e) => handleWatchLater()}
+      >
         <MdOutlineWatchLater className="w-6 h-6" />
-        <label>Save to Watch Later</label>
+        <span>Save to Watch Later</span>
       </div>
-      <div className={menuItemClasses}>
+      <div 
+        className={menuItemClasses}
+      >
         <PiShareFat className="w-6 h-6" />
-        <label>Share</label>
+        <span>Share</span>
       </div>
       {/* <div className={menuItemClasses}>
         <RiPlayListAddFill className="w-6 h-6" />

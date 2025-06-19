@@ -1,13 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 
-const watchLaterSchema = new Schema(
+const WatchLaterSchema = new Schema(
 {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    video: {
+    video: [
+      {
         videoId: {
           type: String,  
           required: true,
@@ -38,7 +39,8 @@ const watchLaterSchema = new Schema(
           type: Date,
           default: Date.now,  
         },
-      }, 
+      },
+    ],
     createdAt: {
       type: Date,
       default: Date.now,
@@ -53,4 +55,4 @@ const watchLaterSchema = new Schema(
   }
 );
  
-export const watchLater = mongoose.model('watchLater', watchLaterSchema); 
+export const WatchLater = mongoose.model('WatchLater', WatchLaterSchema); 
