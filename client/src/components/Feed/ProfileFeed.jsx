@@ -17,8 +17,7 @@ function ProfileFeed() {
             <div className='flex flex-col gap-3 justify-center'>
                 <h1 className='text-4xl font-bold'>Dhanush Moagaveer</h1>
                 <div className='flex text-lg font-medium gap-5'>
-                    <h1>@dhanushmogaveer5316</h1>
-                    <p>view channel</p>
+                    <h1>@dhanushmogaveer5316</h1> 
                 </div>
                 <div className='flex gap-6'>
                     <Link to='/register' className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
@@ -31,19 +30,7 @@ function ProfileFeed() {
                     </Link> 
                 </div>
             </div> 
-        </div>
-
-        {/* History */}
-        <div>
-            <h1 className='text-2xl font-bold px-10'>History</h1> 
-            <SampleVideo/>
-        </div>
-
-        {/* PlayList */}
-        <div>
-            <h1 className='text-2xl font-bold px-10'>PlayList</h1> 
-            <SampleVideo/>
-        </div>
+        </div> 
 
         {/* Watch Later */}
         <div>

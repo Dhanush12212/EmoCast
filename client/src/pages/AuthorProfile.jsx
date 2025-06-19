@@ -5,6 +5,7 @@ import { API_URL } from '../../config';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoaderOrError from '../components/LoaderOrError';
+import ChannelVideos from '../components/Video/ChannelVideos';
 
 function AuthorProfile() {
   const navigate = useNavigate()
@@ -82,38 +83,7 @@ function AuthorProfile() {
 
               {/* Videos Section */}
               <h2 className="text-3xl font-semibold mb-6 text-gray-400">Videos</h2>
-              <div className="flex flex-wrap justify-start gap-10 px-2">
-                {channel.videos.map(({ videoId, thumbnailUrl, viewCount, publishDate, title, duration }) => (
-                  <div
-                    key={videoId}
-                    className="bg-[#1f1f1f] w-full sm:w-[48%] lg:w-[30%] xl:w-[23%] rounded-xl overflow-hidden shadow-md transition transform hover:scale-105 cursor-pointer"
-                    onClick={() => {
-                      navigate(`/videos/${videoId}`)
-                    }}
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative">
-                      <img
-                        src={thumbnailUrl}
-                        alt="video"
-                        className="w-full h-44 object-cover"
-                      />
-                      <span className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-xs px-2 py-1 rounded text-white">
-                        {duration}
-                      </span>
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-4 flex flex-col gap-3">
-                      <h3 className="text-lg font-medium line-clamp-2">{title}</h3>
-                      <div className="text-md text-gray-400 font-medium flex justify-between flex-wrap">
-                        <span>{publishDate}</span>
-                        <span>{viewCount} views</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                <ChannelVideos videos={channel.videos}/>
             </div>
           </div>
         </div>
