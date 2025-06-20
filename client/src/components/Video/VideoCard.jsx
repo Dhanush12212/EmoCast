@@ -77,32 +77,22 @@ function VideoCard({ selectedCategory, category }) {
               {query ? `No videos found matching "${query}"` : 'No videos available.'}
             </p>
           ) : (
-            videos.map(({
-              videoId,
-              thumbnailUrl,
-              title,
-              channelThumbnail,
-              channelTitle,
-              viewCount,
-              publishDate,
-              duration,
-              channelId
-            }) => (
+            videos.map((video) => (
               <div
-                key={videoId}
+                key={video.videoId}
                 onClick={(e) => {
                   if (!e.target.closest('.menu-btn')) {
-                    navigate(`/videos/${videoId}`);
+                    navigate(`/videos/${video.videoId}`);
                   }
                 }}
                 className="relative h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
               >
                 {/* Thumbnail */}
                 <div className="relative w-full h-full rounded-t-2xl overflow-hidden">
-                  <img src={thumbnailUrl} alt="video" className="w-full h-full object-cover" />
-                  {duration && (
+                  <img src={video.thumbnailUrl} alt="video" className="w-full h-full object-cover" />
+                  {video.duration && (
                     <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
-                      {duration}
+                      {video.duration}
                     </span>
                   )}
                 </div>
@@ -111,52 +101,55 @@ function VideoCard({ selectedCategory, category }) {
                 <div className="py-3 flex justify-between relative">
                   <div className="flex gap-3">
                     <div className="h-14 w-14 relative flex justify-center items-center rounded-full overflow-hidden border border-red-400 shrink-0 bg-gradient-to-tr from-gray-800 to-gray-900">
-                      {channelThumbnail ? (
+                      {video.channelThumbnail ? (
                         <img
-                          src={channelThumbnail}
-                          alt={channelTitle}
+                          src={video.channelThumbnail}
+                          alt={video.channelTitle}
                           className="w-full h-full object-cover"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/channel/${channelId}`);
+                            navigate(`/channel/${video.channelId}`);
                           }}
                         />
                       ) : (
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/channel/${channelId}`);
+                            navigate(`/channel/${video.channelId}`);
                           }}
                           className="absolute font-semibold text-2xl uppercase text-gray-300 cursor-pointer"
                         >
-                          {channelTitle?.charAt(0)}
+                          {video.channelTitle?.charAt(0)}
                         </span>
                       )}
                     </div>
                     <div>
-                      <h1 className="text-xl font-semibold leading-tight line-clamp-2">{title}</h1>
-                      <p className="text-lg text-gray-400 mt-2">{channelTitle}</p>
+                      <h1 className="text-xl font-semibold leading-tight line-clamp-2">{video.title}</h1>
+                      <p className="text-lg text-gray-400 mt-2">{video.channelTitle}</p>
                       <div className="flex gap-3 text-lg text-gray-400">
-                        <p>{viewCount}</p>
+                        <p>{video.viewCount}</p>
                         &bull;
-                        <p>{publishDate}</p>
+                        <p>{video.publishDate}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* More Menu */}
                   <div className="relative">
-                    <button onClick={() => handleMenuToggle(videoId)} className="menu-btn">
+                    <button onClick={() => handleMenuToggle(video.videoId)} className="menu-btn">
                       <MoreVertIcon style={{ fontSize: '25px', cursor: 'pointer' }} />
                     </button>
-                    {openMenuId === videoId && (
+                    {openMenuId === video.videoId && (
                       <div
                         ref={menuRef}
                         onClick={(e) => e.stopPropagation()}
                         onMouseDown={(e) => e.stopPropagation()}
                         className="absolute top-6 right-0 z-50"
                       >
-                        <VideoMenu />
+                        <VideoMenu
+                          video={video}
+                          closeMenu={() => setOpenMenuId(null)} 
+                        />
                       </div>
                     )}
                   </div>

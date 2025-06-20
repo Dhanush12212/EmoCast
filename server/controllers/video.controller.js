@@ -53,6 +53,7 @@ const fetchVideos = asyncHandler(async (req, res) => {
                 channelTitle: item.snippet?.channelTitle || "Unknown Channel",
                 channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
                 publishDate: timeAgo(item.snippet?.publishedAt || ''),
+                publishAt: item.snippet?.publishedAt || '',
                 viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
                 duration: item.contentDetails?.duration
                       ? parseDuration(item.contentDetails.duration)

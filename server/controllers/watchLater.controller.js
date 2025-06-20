@@ -6,13 +6,17 @@ import { WatchLater } from '../models/watchLater.model.js'
 const addVideos = asyncHandler(async (req, res) => {
   const { video } = req.body;
   const userId = req.user.id;
-
+  console.log("User ID", userId);
+  
+  console.log("Received body:", req.body);
+  
   try {
     let userWatchLater = await WatchLater.findOne({ userId });
  
-    if (userWatchLater) {
+    if (userWatchLater) { 
+
       const isDuplicate = userWatchLater.video.some(
-        (v) => v.videoId === video.videoId
+        (v) => v?.videoId === video.videoId
       );
 
       if (isDuplicate) {
@@ -20,9 +24,6 @@ const addVideos = asyncHandler(async (req, res) => {
       }
 
       userWatchLater.video.push(video);
-      await userWatchLater.save();
-    } else {
-      userWatchLater = new WatchLater({ userId, video: [video] });
       await userWatchLater.save();
     }
 
