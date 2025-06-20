@@ -8,12 +8,14 @@ import RegisterPage from './components/Authentication/RegisterPage';
 import VideoPage from './pages/VideoPage'; 
 import ShortsPage from './pages/ShortsPage';
 import AuthorProfile from './pages/AuthorProfile';
+import WatchLater from './components/Video/WatchLater';
 
 function App() {
   return ( 
     <Router>
       <Routes>
-        <Route path='/' element={<LandingPage/>} />   
+        {/* <Route path='/' element={<LandingPage/>} />    */}
+        <Route path='/' element={<WatchLater/>} />   
         <Route path='/channel/:channelId' element={<AuthorProfile/>} />   
         <Route path='/profile' element={<Profile/>} />   
         <Route path='/subscription' element={<Subscription/>} />   

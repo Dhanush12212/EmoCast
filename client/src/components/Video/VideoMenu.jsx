@@ -25,10 +25,7 @@ function VideoMenu({ video, closeMenu}) {
       channelTitle,
       viewCount,
       channelThumbnail,
-    } = video;
-    
-    
-    console.log("Full video object:", video); 
+    } = video; 
     
     try {
       await axios.post(`${API_URL}/watchLater/add`, {
