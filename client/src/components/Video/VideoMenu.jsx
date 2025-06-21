@@ -46,8 +46,7 @@ function VideoMenu({ video, closeMenu}) {
       });
       console.log("Added to Watch Later");
       closeMenu();
-    } catch(err) {
-      console.error("Error:", err); 
+    } catch(err) { 
       console.log(err.response?.data?.message || 'Failed to add to Watch Later');
     }
   }

@@ -5,10 +5,7 @@ import { WatchLater } from '../models/watchLater.model.js'
  
 const addVideos = asyncHandler(async (req, res) => {
   const { video } = req.body;
-  const userId = req.user.id;
-  console.log("User ID", userId);
-  
-  console.log("Received body:", req.body);
+  const userId = req.user.id; 
   
   try {
     let userWatchLater = await WatchLater.findOne({ userId });

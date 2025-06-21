@@ -14,8 +14,8 @@ function App() {
   return ( 
     <Router>
       <Routes>
-        {/* <Route path='/' element={<LandingPage/>} />    */}
-        <Route path='/' element={<WatchLater/>} />   
+        <Route path='/' element={<LandingPage/>} />   
+        <Route path='/watchLater' element={<WatchLater/>} />   
         <Route path='/channel/:channelId' element={<AuthorProfile/>} />   
         <Route path='/profile' element={<Profile/>} />   
         <Route path='/subscription' element={<Subscription/>} />   

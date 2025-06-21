@@ -1,5 +1,5 @@
 import React from 'react'
-import { MdOutlineSwitchAccount } from "react-icons/md";
+import { MdOutlineSwitchAccount, MdWatchLater } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa"; 
 import { assets } from '../../assets/assets';
 import SampleVideo from '../SampleVideo';
@@ -35,7 +35,7 @@ function ProfileFeed() {
         {/* Watch Later */}
         <div>
             <h1 className='text-2xl font-bold px-10'>Watch Later</h1> 
-            <SampleVideo/>
+            <MdWatchLater/>
         </div>
 
         {/* Liked Videos */}

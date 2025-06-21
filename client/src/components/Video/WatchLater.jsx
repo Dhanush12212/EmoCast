@@ -6,110 +6,121 @@ import { API_URL } from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../LoaderOrError'; 
+import { assets } from '../../assets/assets';
+import NavBar from '../NavBar/NavBar';
+import SideBar from '../NavBar/SideBar';
     
-function WatchLater() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [videos, setVideos] = useState([]);
-    const [openMenuId, setOpenMenuId] = useState(null);
-    const menuRef = useRef(null);
-    const navigate = useNavigate();
-    const { query } = useParams();
-    return (
-    <div className='w-full h-screen'>
-        <h1 className='text-4xl font-bold text-gray-400 mb-10 mt-5 ml-5'>Watch later videos</h1>
-        <div className='border-1 border-[#3c3c3c] w-full h-0 left-0'></div> 
+function WatchLater() { 
+      
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const navigate = useNavigate();
 
-        {/* videos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 mt-5 px-6">
-          {videos.length === 0 ? (
-            <p className="text-center text-gray-400 text-lg mt-10 italic">
-              {query ? `No videos found matching "${query}"` : 'No videos available.'}
-            </p>
-            ) : (
-            videos.map((video) => (
-              <div
-                key={video.videoId}
-                onClick={(e) => {
-                  if (!e.target.closest('.menu-btn')) {
-                    navigate(`/videos/${video.videoId}`);
-                  }
-                }}
-                className="relative h-[300px] rounded-2xl flex flex-col shadow-md cursor-pointer transition-transform transform hover:scale-105 hover:shadow-lg duration-300"
-              >
-                {/* Thumbnail */}
-                <div className="relative w-full h-full rounded-t-2xl overflow-hidden">
-                  <img src={video.thumbnailUrl} alt="video" className="w-full h-full object-cover" />
-                  {video.duration && (
-                    <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
-                      {video.duration}
-                    </span>
-                  )}
-                </div>
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${API_URL}/watchLater/videos`, {
+          withCredentials: true,
+        }); 
 
-                {/* Info Section */}
-                <div className="py-3 flex justify-between relative">
-                  <div className="flex gap-3">
-                    <div className="h-14 w-14 relative flex justify-center items-center rounded-full overflow-hidden border border-red-400 shrink-0 bg-gradient-to-tr from-gray-800 to-gray-900">
-                      {video.channelThumbnail ? (
-                        <img
-                          src={video.channelThumbnail}
-                          alt={video.channelTitle}
-                          className="w-full h-full object-cover"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/channel/${video.channelId}`);
-                          }}
-                        />
-                      ) : (
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/channel/${video.channelId}`);
-                          }}
-                          className="absolute font-semibold text-2xl uppercase text-gray-300 cursor-pointer"
-                        >
-                          {video.channelTitle?.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <h1 className="text-xl font-semibold leading-tight line-clamp-2">{video.title}</h1>
-                      <p className="text-lg text-gray-400 mt-2">{video.channelTitle}</p>
-                      <div className="flex gap-3 text-lg text-gray-400">
-                        <p>{video.viewCount}</p>
-                        &bull;
-                        <p>{video.publishDate}</p>
-                      </div>
-                    </div>
-                  </div>
+        // Filter out nulls or any invalid entries
+        const cleanedVideos = Array.isArray(response.data)
+          ? response.data.filter(video => video && video.videoId)
+          : [];
 
-                  {/* More Menu */}
-                  <div className="relative">
-                    <button onClick={() => handleMenuToggle(video.videoId)} className="menu-btn">
-                      <MoreVertIcon style={{ fontSize: '25px', cursor: 'pointer' }} />
-                    </button>
-                    {openMenuId === video.videoId && (
-                      <div
-                        ref={menuRef}
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        className="absolute top-6 right-0 z-50"
-                      >
-                        <VideoMenu
-                          video={video}
-                          closeMenu={() => setOpenMenuId(null)} 
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        setVideos(cleanedVideos);
+
+      } catch (error) {
+        console.error("ERROR:", error);
+        setError(error.response?.data?.message || "Failed to fetch videos!!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+       
+return (
+<div className="flex flex-col h-screen">
+      {/* Fixed NavBar */}
+      <div className="fixed top-0 left-0 w-full z-50">
+        <NavBar />
+      </div>
+
+      <div className="flex flex-1 pt-25"> 
+        {/* Fixed Sidebar */}
+        <div className="fixed  left-0 top-0 w-64 ">
+          <SideBar />
         </div>
+
+        {/* Main Content */}
+        <div className="flex-1 ml-25 overflow-x-hidden">
+
+          {/* Home Feed */}
+          <div className="w-full min-h-screen bg-[#0f0f0f] text-white px-10 py-2"> 
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">📺 Watch Later</h1>
+
+            <LoaderOrError loading={loading} error={error} />
+
+            {!loading && !error && (
+              videos.length === 0 ? (
+                <div className="text-center text-gray-400 mt-16 text-xl">
+                  <p>No videos added to your Watch Later list.</p>
+                  <p className="text-sm mt-2">Start exploring and save videos you want to watch later!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {videos.map((video, index) => (
+                    <div
+                      key={index}
+                      className="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02]"
+                    >
+                      <div className="w-full h-[180px] overflow-hidden">
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={video.title}
+                          className="w-full h-full object-cover"
+                          onClick={() => navigate(`/videos/${video.videoId}`)}
+                        />
+                        {video.duration && (
+                          <span className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-1.5 py-0.5 rounded-md">
+                            {video.duration}
+                          </span>
+                        )}
+                      </div>
+                  
+                      <div className="flex items-start gap-3 p-4 ">
+                        <img
+                          src={video.channelThumbnail || assets.Subscription}
+                          alt="Channel"
+                          className="h-10 w-10 rounded-full object-cover border"
+                          onClick={() => navigate(`/channel/${video.channelId}`)}
+                        />
+                        <div className="flex flex-col">
+                          <h2 className="text-lg font-medium text-white line-clamp-2">{video.title}</h2>
+                          <p className="text-sm text-gray-400 mt-1 line-clamp-1">{video.channelTitle}</p>
+                          <div className="flex flex-wrap gap-2 text-sm text-gray-500 mt-1">
+                            <span>{video.viewCount || 'N/A'}</span>
+                            <span>&bull;</span>
+                            <span>{video.publishAt ? new Date(video.publishAt).toLocaleDateString() : 'Unknown date'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </div>
     </div>
-  )
+);
+
 }
 
 export default WatchLater
