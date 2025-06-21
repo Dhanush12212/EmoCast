@@ -41,8 +41,21 @@ const fetchVideos = asyncHandler( async( req, res) => {
   }
 });
 
+const deleteVideo = asyncHandler( async(req, res) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.user.id;
+
+    await WatchLater.findOneAndDelete({ userId, videoId });
+    res.status(200).json({ message: "Video removed from the Watch Later"})
+  } catch(error) {
+    throw new ApiError(500, "Failed to delete video");
+  }
+});
+
 
 export { 
     addVideos, 
     fetchVideos, 
+    deleteVideo,
 }
