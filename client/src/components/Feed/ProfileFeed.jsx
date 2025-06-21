@@ -1,51 +1,53 @@
-import React from 'react'
-import { MdOutlineSwitchAccount, MdWatchLater } from "react-icons/md";
+import React from 'react';
+import { MdOutlineSwitchAccount } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa"; 
 import { assets } from '../../assets/assets';
-import SampleVideo from '../SampleVideo';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import WatchLater from '../Video/WatchLater';
 
 function ProfileFeed() {
- 
   return (
-    <div className='p-6 flex flex-col gap-10'>
-        <div className='h-full px-10 w-full flex gap-6 '> 
-        <div className="flex justify-center items-center">
-            <img src={assets.Subscription} alt="Subscription Icon" className="h-40 w-40 p-1 bg-white rounded-full" />
-        </div>
+    <div className="min-h-screen w-full px-6 py-10 bg-[#0f0f0f] text-white flex flex-col items-center gap-10">
 
-            <div className='flex flex-col gap-3 justify-center'>
-                <h1 className='text-4xl font-bold'>Dhanush Moagaveer</h1>
-                <div className='flex text-lg font-medium gap-5'>
-                    <h1>@dhanushmogaveer5316</h1> 
-                </div>
-                <div className='flex gap-6'>
-                    <Link to='/register' className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
-                        <MdOutlineSwitchAccount className='h-5 w-5'/>
-                        <span>Switch Acount</span>
-                    </Link>
-                    <Link to='/login' className='bg-[#272727] hover:bg-[#3F3F3F] px-3 py-2 rounded-2xl flex gap-2 items-center'>
-                        <FaGoogle className='h-5 w-5'/>
-                        <span>Google account</span>
-                    </Link> 
-                </div>
-            </div> 
-        </div> 
+      {/* Profile Section */}
+      <div className="w-full max-w-5xl bg-[#1c1c1c] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-10 shadow-md justify-center">
+        <img
+          src={assets.Subscription}
+          alt="Profile"
+          className="h-36 w-36 md:h-40 md:w-40 rounded-full border-4 border-white object-cover"
+        />
 
-        {/* Watch Later */}
-        <div>
-            <h1 className='text-2xl font-bold px-10'>Watch Later</h1> 
-            <MdWatchLater/>
-        </div>
+        <div className="flex flex-col gap-3 text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-bold">Dhanush Moagaveer</h1>
+          <p className="text-gray-400 text-lg">@dhanushmogaveer5316</p>
 
-        {/* Liked Videos */}
-        <div>
-            <h1 className='text-2xl font-bold px-10'>Liked Videos</h1> 
-            <SampleVideo/>
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3">
+            <Link
+              to="/register"
+              className="flex items-center gap-2 px-5 py-2 bg-[#272727] hover:bg-[#3F3F3F] rounded-full transition-all"
+            >
+              <MdOutlineSwitchAccount className="w-5 h-5" />
+              <span>Switch Account</span>
+            </Link>
+
+            <Link
+              to="/login"
+              className="flex items-center gap-2 px-5 py-2 bg-[#272727] hover:bg-[#3F3F3F] rounded-full transition-all"
+            >
+              <FaGoogle className="w-5 h-5" />
+              <span>Google Account</span>
+            </Link>
+          </div>
         </div>
-         
+      </div>
+
+      {/* Watch Later Section */} 
+
+    <div className="shadow-md pr-15">
+      <WatchLater />
+    </div> 
     </div>
-  )
+  );
 }
 
-export default ProfileFeed
+export default ProfileFeed;

@@ -3,13 +3,13 @@ import {Link} from 'react-router-dom'
 import { GoHomeFill } from "react-icons/go";
 import { SiYoutubeshorts } from "react-icons/si";
 import { MdOutlineSubscriptions } from "react-icons/md"; 
-import { CgProfile } from "react-icons/cg"; 
+import { CgProfile } from "react-icons/cg";  
 
 export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/' },
   { icon: SiYoutubeshorts, label: "Shorts", path: '/shorts'},
   { icon: MdOutlineSubscriptions, label: "Subscription", path: '/subscription'},  
-  { icon: CgProfile, label: "Profile", path:'/profile' },  
+  { icon: CgProfile, label: "You", path:'/profile' },  
 ];
 
 function SideBar() {

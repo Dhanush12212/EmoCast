@@ -7,8 +7,7 @@ export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/'},
   { icon: SiYoutubeshorts, label: "Shorts", path: '/shorts' },
   { icon: MdOutlineSubscriptions, label: "Subscription", path: '/subscription' },  
-  { icon: MdOutlineWatchLater, label: "Watch Later", path: '/watchLater' }, 
-  { icon: AiOutlineLike, label: "Liked Videos", path: '/profile' },     
+  { icon: MdOutlineWatchLater, label: "Watch Later", path: '/watchLater' },  
   {divider: true},
 ];
 
