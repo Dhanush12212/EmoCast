@@ -150,7 +150,7 @@ function VideoCard({ selectedCategory, category }) {
                       <div
                         ref={menuRef}
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute top-6 right-0 z-50"
+                        className="absolute top-3 right-0 z-50"
                       >
                         <VideoMenu video={video} closeMenu={() => setOpenMenuId(null)} />
                       </div>

@@ -18,7 +18,9 @@ const GoogleAuth = ({ clientID , setMessage, navigate }) => {
         { credential: token },  
         { withCredentials: true }
       );
-
+      const { user } = response.data.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      
       setMessage({ text: "🎉 Login Successful!", type: "success" });
       setTimeout(() => navigate("/"), 500);
     } catch (error) {

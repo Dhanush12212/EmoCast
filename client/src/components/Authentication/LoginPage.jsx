@@ -4,14 +4,14 @@ import axios from "axios";
 import { MdOutlineMail, MdOutlinePassword } from "react-icons/md"; 
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"; 
 import { API_URL, clientID } from "../../../config"; 
-import GoogleAuth from './GoogleAuth';
+import GoogleAuth from './GoogleAuth'; 
 
 function Login( { login }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
 
   const togglePasswordView = () => setShowPassword(!showPassword); 
 
@@ -24,7 +24,11 @@ function Login( { login }) {
         { email, password },
         { withCredentials: true }
       );
-      console.log("Login successful:", response.data);
+      console.log("Login successful:", response.data); 
+
+      const { user } = response.data.data;
+      localStorage.setItem('user', JSON.stringify(user));      
+      
       setMessage({ text: "🎉 Login Successful!", type: "success" });
       setTimeout(() => navigate("/"), 500);
     } catch (error) {

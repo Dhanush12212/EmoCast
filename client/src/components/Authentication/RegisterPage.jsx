@@ -24,10 +24,9 @@ function RegisterPage({ register }) {
         `${API_URL}/auth/register`,
         { username, email, password },
         { withCredentials: true }
-      ); 
-      console.log(response);
-      
-
+      );  
+      const { user } = response.data.data;
+      localStorage.setItem('user', JSON.stringify(user));
       setMessage({ text: "🎉 Registered Successful!", type: "success" });
 
       setTimeout(() => {
