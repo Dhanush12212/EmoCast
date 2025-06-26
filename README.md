@@ -36,7 +36,7 @@
 
 ### Emotion Detection (Python)
 
-- **Flask / FastAPI**: For real-time facial emotion detection.
+- **Flask**: For real-time facial emotion detection.
 - **OpenCV**: Used in Python for capturing webcam images and processing facial expressions.
 
 ---
@@ -50,6 +50,16 @@
 - **dotenv**: To manage environment variables securely.
 
 ---
+
+
+## Preview
+
+### Home Page
+![Home Page](./client/src/assets/HomePage.png)
+
+### 🎥 Profile Page
+![Profile Page](./client/src/assets/ProfilePage.png)
+ 
 
 ## Installation & Setup
 
