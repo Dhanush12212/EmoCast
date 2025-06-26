@@ -32,6 +32,7 @@
 - **Express.js**: Web framework for handling API routes.
 - **MongoDB**: NoSQL database to store user data, moods, and preferences.
 - **JWT & bcrypt.js**: For secure authentication and password hashing.
+- ** Google OAuth & bcrypt.js**: For secure authentication, third-party login.
 - **dotenv**: For environment variable management.
 
 ### Emotion Detection (Python)
@@ -50,8 +51,7 @@
 - **dotenv**: To manage environment variables securely.
 
 ---
-
-
+ 
 ## Preview
 
 ### Home Page
@@ -59,7 +59,8 @@
 
 ### 🎥 Profile Page
 ![Profile Page](./client/src/assets/ProfilePage.png)
- 
+
+---
 
 ## Installation & Setup
 
