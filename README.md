@@ -32,11 +32,12 @@
 - **Express.js**: Web framework for handling API routes.
 - **MongoDB**: NoSQL database to store user data, moods, and preferences.
 - **JWT & bcrypt.js**: For secure authentication and password hashing.
+- ** Google OAuth & bcrypt.js**: For secure authentication, third-party login.
 - **dotenv**: For environment variable management.
 
 ### Emotion Detection (Python)
 
-- **Flask / FastAPI**: For real-time facial emotion detection.
+- **Flask**: For real-time facial emotion detection.
 - **OpenCV**: Used in Python for capturing webcam images and processing facial expressions.
 
 ---
@@ -48,6 +49,16 @@
 - **JWT (JSON Web Token)**: For implementing secure user authentication.
 - **bcrypt.js**: For hashing and securing user passwords.
 - **dotenv**: To manage environment variables securely.
+
+---
+ 
+## Preview
+
+### Home Page
+![Home Page](./client/src/assets/HomePage.png)
+
+### 🎥 Profile Page
+![Profile Page](./client/src/assets/ProfilePage.png)
 
 ---
 
