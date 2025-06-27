@@ -5,7 +5,7 @@ import { API_URL } from '../../config';
 import { useParams } from 'react-router-dom';
 import VideoPlayer from '../components/Video/VideoPlayer';
 import RecommendedVideo from '../components/Video/RecommendedVideo'; 
-import LoaderOrError from '../components/LoaderOrError';
+import LoaderOrError from '../components/Reausables/LoaderOrError';
 
 function VideoPage() { 
   const [loading, setLoading] = useState(false);

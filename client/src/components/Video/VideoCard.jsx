@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API_URL } from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
-import LoaderOrError from '../LoaderOrError';
+import LoaderOrError from '../Reausables/LoaderOrError';
 
 function VideoCard({ selectedCategory, category }) {
   const [loading, setLoading] = useState(false);

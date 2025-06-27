@@ -1,12 +1,11 @@
-import SampleVideo from '../SampleVideo'
-import React, { useState, useEffect, useRef } from 'react';
+ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import { CiBookmarkRemove } from "react-icons/ci"
-import LoaderOrError from '../LoaderOrError'; 
+import LoaderOrError from '../Reausables/LoaderOrError'; 
 import { assets } from '../../assets/assets';
 import NavBar from '../NavBar/NavBar';
 import SideBar from '../NavBar/SideBar';

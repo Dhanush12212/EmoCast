@@ -3,6 +3,7 @@ import { SlLike, SlDislike } from "react-icons/sl";
 import { RiShareForwardLine } from "react-icons/ri";
 import { LiaDownloadSolid } from "react-icons/lia";
 import { useNavigate } from 'react-router-dom';
+import SubscribeButton from '../Reausables/SubscribeButton';
 
 function VideoPlayer({ video }) {
   const navigate = useNavigate();
@@ -90,9 +91,7 @@ function VideoPlayer({ video }) {
             <h2 className="text-lg font-semibold">{channelTitle}</h2>
             <p className="text-md text-gray-400">{subscribers} subscribers</p>
           </div>
-          <button className="ml-4 px-6 py-2 bg-white text-black rounded-full text-ld font-medium hover:bg-gray-200 cursor-pointer">
-            Subscribe
-          </button>
+          <SubscribeButton channelId={channelId} />
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">

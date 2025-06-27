@@ -34,7 +34,7 @@ app.use('/api/v1/allVideos', videoRoute);
 app.use('/api/v1/searchVideos', searchRoute);
 app.use('/api/v1/channel', channelRoute);
 app.use('/api/v1/watchLater', watchLaterRoute);
-app.use('/api/v1/:channelId', subscribeRoute);
+app.use('/api/v1/subscribe', subscribeRoute); 
 
 const startServer = async() => {
     try{

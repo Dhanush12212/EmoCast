@@ -4,7 +4,7 @@ import SideBar from '../components/NavBar/SideBar';
 import { API_URL } from '../../config';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import LoaderOrError from '../components/LoaderOrError';
+import LoaderOrError from '../components/Reausables/LoaderOrError';
 import ChannelVideos from '../components/Video/ChannelVideos';
 
 function AuthorProfile() {
