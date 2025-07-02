@@ -63,35 +63,29 @@ function VideoPlayer({ video }) {
 
       {/* Channel & Actions */}
       <div className="flex items-center justify-between flex-wrap gap-4 cursor-pointer">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4"
+          onClick={() => navigate(`/channel/${channelId}`)}
+        >
           {channelThumbnailUrl && channelThumbnailUrl !== '' ? (
             <img
               src={channelThumbnailUrl}
               alt={channelTitle}
-              className="h-14 w-14 rounded-full object-cover cursor-pointer"
-              onClick={(e) => { 
-                e.stopPropagation();
-                navigate(`/channel/${channelId}`); 
-              }}
+              className="h-14 w-14 rounded-full object-cover cursor-pointer" 
               /> 
           ) : (
             <span 
-              className="absolute font-semibold text-2xl uppercase text-gray-300">
-              e.stopPropagation();
-              onClick={(e) => { 
-                navigate(`/channel/${channelId}`); 
-              }}  
+              className="absolute font-semibold text-2xl uppercase text-gray-300"> 
               {channelTitle?.charAt(0)}
             </span>  
           )}
-          <div 
-            onClick={() => { 
-              navigate(`/channel/${channelId}`); 
-            }} >
+          <div>
             <h2 className="text-lg font-semibold">{channelTitle}</h2>
             <p className="text-md text-gray-400">{subscribers} subscribers</p>
           </div>
-          <SubscribeButton channelId={channelId} />
+          <div onClick={(e) => e.stopPropagation()}>
+              <SubscribeButton channelId={channelId} />
+          </div>
+
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">

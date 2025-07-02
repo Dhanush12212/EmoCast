@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoaderOrError from '../components/Reausables/LoaderOrError';
 import ChannelVideos from '../components/Video/ChannelVideos';
+import SubscribeButton from '../components/Reausables/SubscribeButton';
 
 function AuthorProfile() {
   const navigate = useNavigate()
@@ -72,10 +73,12 @@ function AuthorProfile() {
                     <p>{channel.videos.length} Videos</p>
                   </div>
                   <p className="text-gray-400 max-w-4xl">{channel.description}</p>
-                  <button className="mt-2 px-6 py-2 cursor-pointer md:w-[140px] bg-white text-black rounded-full hover:bg-gray-300 transition duration-300">
-                    Subscribe
-                  </button>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <SubscribeButton channelId={channelId} />
+                  </div>
                 </div>
+
               </div>
 
               {/* Divider */}

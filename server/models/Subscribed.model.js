@@ -3,13 +3,13 @@ import mongoose, { Schema } from 'mongoose';
 const ChannelSchema = new Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User",
       required: true,
     },
     subscribedTo: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: "User",  
       }
     ],

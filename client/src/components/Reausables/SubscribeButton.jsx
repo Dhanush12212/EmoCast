@@ -5,9 +5,9 @@ import { API_URL } from '../../../config';
 const SubscribeButton = ({ channelId }) => {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+ 
+  useEffect(() => {  
 
-  // 👇 Check if the user is already subscribed
-  useEffect(() => {
     const checkSubscriptionStatus = async () => {
       try {
         const res = await axios.get(
@@ -22,8 +22,7 @@ const SubscribeButton = ({ channelId }) => {
 
     checkSubscriptionStatus();
   }, [channelId]);
-
-  // 👇 Handle subscribe/unsubscribe toggle
+ 
   const handleClick = async () => {
     setLoading(true);
 
@@ -33,8 +32,7 @@ const SubscribeButton = ({ channelId }) => {
           withCredentials: true,
         });
         setSubscribed(false);
-      } else {
-        // ✅ Subscribe (POST)
+      } else { 
         await axios.post(`${API_URL}/subscribe/${channelId}`, {}, {
           withCredentials: true,
         });
@@ -51,8 +49,8 @@ const SubscribeButton = ({ channelId }) => {
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`px-4 py-2 rounded font-semibold text-white transition ${
-        subscribed ? "bg-gray-600" : "bg-red-600 hover:bg-red-700"
+      className={`px-5 py-3 rounded-full font-semibold transition ${
+        subscribed ? "bg-gray-600 text-white" : "bg-gray-200 text-black hover:bg-gray-400"
       }`}
     >
       {loading

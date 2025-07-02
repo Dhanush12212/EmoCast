@@ -4,8 +4,8 @@ import { verifyJWT } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.route('/:channelId').post(verifyJWT, Subscribe);
-router.route('/:channeId').delete(verifyJWT, Unsubscribe );
 router.route('/check/:channelId').get(verifyJWT, isSubscribed );
+router.route('/:channelId').post(verifyJWT, Subscribe);
+router.route('/:channelId').delete(verifyJWT, Unsubscribe );
 
 export default router;
