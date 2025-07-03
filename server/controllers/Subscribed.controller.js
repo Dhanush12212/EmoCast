@@ -1,7 +1,14 @@
 import ApiError from '../utils/ApiError.utils.js'; 
 import asyncHandler from '../utils/asyncHandler.utils.js';
-import { Channel } from '../models/Subscribed.model.js';
-import mongoose from 'mongoose';
+import { Channel } from '../models/Subscribed.model.js'; 
+import { formatNumber, timeAgo, parseDuration } from '../utils/Formatters.utils.js';
+import dotenv from "dotenv"
+dotenv.config({
+    path:'./.env'
+})
+import axios from 'axios';
+
+const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 
 const Subscribe = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
@@ -81,8 +88,65 @@ const isSubscribed = asyncHandler(async (req, res) => {
 });
 
 
+const fetchSubscription = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    if (!userId) {
+      throw new ApiError(401, 'Unauthorized: User ID missing');
+    }
+
+    const userChannel = await Channel.findOne({ userId });
+
+    if (!userChannel || userChannel.subscribedTo.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No subscriptions found',
+        subscribedChannels: [],
+      });
+    }
+
+    const channelIds = userChannel.subscribedTo;
+
+    // Fetch YouTube channel details
+    const { data } = await axios.get( CHANNELS_API_URL, {
+        params: {
+          part: 'snippet,statistics',
+          id: channelIds.join(','),
+          key: YOUTUBE_API_KEY,
+        },
+      }
+    );
+ 
+    const transformedChannels = data.items.map((channel) => ({
+      channelId: channel.id, 
+      thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
+      title: item.snippet?.title || "No title",
+      description: item.snippet?.description || "No description available",
+      channelTitle: item.snippet?.channelTitle || "Unknown Channel",
+      channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+      publishDate: timeAgo(item.snippet?.publishedAt || ''),
+      publishAt: item.snippet?.publishedAt || '',
+      viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
+      duration: item.contentDetails?.duration
+            ? parseDuration(item.contentDetails.duration)
+            : '0:00',    
+      channelId,
+    }));
+
+    res.status(200).json({
+      success: true,
+      subscribedChannels: transformedChannels,
+    });
+  } catch (error) {
+    console.error('Error fetching subscribed channels:', error.message);
+    throw new ApiError(500, 'Failed to fetch subscribed channel details');
+  }
+
+
 export {
     Subscribe,
     Unsubscribe,
-    isSubscribed
+    isSubscribed,
+    fetchSubscription
 }
