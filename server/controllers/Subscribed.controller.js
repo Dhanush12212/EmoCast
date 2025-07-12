@@ -9,6 +9,7 @@ dotenv.config({
 import axios from 'axios';
 
 const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 const Subscribe = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
@@ -25,8 +26,7 @@ const Subscribe = asyncHandler(async (req, res) => {
 
     const isSubscribed = user.subscribedTo.some(id =>
       id.toString() === channelId
-    );
-
+    ); 
 
     if (!isSubscribed) {
       user.subscribedTo.push(channelId);
@@ -111,38 +111,45 @@ const fetchSubscription = asyncHandler(async (req, res) => {
     // Fetch YouTube channel details
     const { data } = await axios.get( CHANNELS_API_URL, {
         params: {
-          part: 'snippet,statistics',
+          part: 'snippet,statistics,contentDetails',
           id: channelIds.join(','),
           key: YOUTUBE_API_KEY,
         },
       }
     );
+
+    if (!data.items || data.items.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No valid subscribed channels found',
+        subscribedChannels: [],
+      });
+    }
  
     const transformedChannels = data.items.map((channel) => ({
       channelId: channel.id, 
-      thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
-      title: item.snippet?.title || "No title",
-      description: item.snippet?.description || "No description available",
-      channelTitle: item.snippet?.channelTitle || "Unknown Channel",
-      channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
-      publishDate: timeAgo(item.snippet?.publishedAt || ''),
-      publishAt: item.snippet?.publishedAt || '',
-      viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
-      duration: item.contentDetails?.duration
-            ? parseDuration(item.contentDetails.duration)
-            : '0:00',    
-      channelId,
-    }));
+      channelTitle: channel.snippet?.title || "Unknown Channel",
+      channelThumbnail: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.medium?.url || channel.snippet?.thumbnails?.default?.url,
+      // thumbnailUrl: channel.snippet?.thumbnails?.high?.url || '',
+      // title: channel.snippet?.title || "No title",
+      // description: channel.snippet?.description || "No description available",
+      // publishDate: timeAgo(channel.snippet?.publishedAt || ''),
+      // publishAt: channel.snippet?.publishedAt || '',
+      // viewCount: formatNumber(channel.statistics?.viewCount ?? '0'),   
+      // duration: channel.contentDetails?.duration
+      //             ? parseDuration(channel.contentDetails.duration)
+      //             : '0:00',    
+    })); 
 
     res.status(200).json({
       success: true,
       subscribedChannels: transformedChannels,
     });
   } catch (error) {
-    console.error('Error fetching subscribed channels:', error.message);
-    throw new ApiError(500, 'Failed to fetch subscribed channel details');
-  }
-
+      console.error('Error fetching subscribed channels:', error.message);
+      throw new ApiError(500, 'Failed to fetch subscribed channel details');
+  } 
+});
 
 export {
     Subscribe,

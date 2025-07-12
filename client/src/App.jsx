@@ -25,7 +25,6 @@ function App() {
         <Route path='/videos/:id' element={ <VideoPage/> } />
         <Route path='/videos/category/:id' element={ <VideoPage/> } />
         <Route path="/search/:query" element={<LandingPage />} /> 
-        
       </Routes>
     </Router> 
   )

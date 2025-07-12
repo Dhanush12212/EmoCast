@@ -14,11 +14,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //validate user
     if( !username || !password || !email )
-        throw new ApiError( 400, "All fields are required!" );
+      throw new ApiError( 400, "All fields are required!" );
 
     const existingUser = await User.findOne({ email });
     if(existingUser)
-        throw new ApiError( 400, "User already found!" );
+      throw new ApiError( 400, "User already found!" );
 
     //Salting
     const salt = await bcrypt.genSalt(10);
@@ -51,39 +51,39 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, existingUser.password);
   if (!isPasswordValid)
     throw new ApiError(400, "Invalid Password!");
- 
+  
   return sendTokenResponse(existingUser, 200, res, "User Login Successfully");
 });
 
 //Auth for Logout
 const logoutUser = async (req, res) => { 
-    res.cookie("token", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-        expires: new Date(0),
-        path: "/", 
-      });
-      res.clearCookie("token"); 
-    return res.status(200).json({ message: "Logout successful" });
+  res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      expires: new Date(0),
+      path: "/", 
+    });
+    res.clearCookie("token"); 
+  return res.status(200).json({ message: "Logout successful" });
 };
 
 //Auth for checking the Log
 const checkLog = asyncHandler( async(req, res, next) => {
-    const accessToken = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-    if( !accessToken)
-        throw new ApiError( 401,"Unauthorized request", ["Acccess token not found!"]);
+  const accessToken = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+  if( !accessToken)
+    throw new ApiError( 401,"Unauthorized request", ["Acccess token not found!"]);
 
-    const decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);
-    if( !decodedToken)
-        throw new ApiError(401, "Invalid Token", ["Token verifiication failed"]);
+  const decodedToken = jwt.verify( accessToken, process.env.JWT_SECRET);
+  if( !decodedToken)
+    throw new ApiError(401, "Invalid Token", ["Token verifiication failed"]);
  
-    const user = await User.findById( decodedToken.id).select("-password");
-    if( !user)
-        throw new ApiError( 400, "User Not Login");
+  const user = await User.findById( decodedToken.id).select("-password");
+  if( !user)
+    throw new ApiError( 400, "User Not Login");
 
-    req.user = user;
-    next();
+  req.user = user;
+  next();
 });
  
 

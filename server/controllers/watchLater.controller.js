@@ -5,13 +5,12 @@ import { WatchLater } from '../models/watchLater.model.js'
  
 const addVideos = asyncHandler(async (req, res) => {
   const { video } = req.body;
-  const userId = req.user.id; 
-  
+  const userId = req.user.id;
+
   try {
     let userWatchLater = await WatchLater.findOne({ userId });
- 
-    if (userWatchLater) { 
 
+    if (userWatchLater) {
       const isDuplicate = userWatchLater.video.some(
         (v) => v?.videoId === video.videoId
       );
@@ -22,6 +21,13 @@ const addVideos = asyncHandler(async (req, res) => {
 
       userWatchLater.video.push(video);
       await userWatchLater.save();
+    } else {
+      // First time: Create new WatchLater document
+      userWatchLater = new WatchLater({
+        userId,
+        video: [video],
+      });
+      await userWatchLater.save();
     }
 
     res.status(200).json({ message: "Added to Watch Later" });
@@ -30,6 +36,7 @@ const addVideos = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Server Error");
   }
 });
+
 
 
 const fetchVideos = asyncHandler( async( req, res) => {

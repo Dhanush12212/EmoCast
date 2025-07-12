@@ -135,27 +135,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
        });
 
        const recommendedItems = recommendedResponse.data.items || [];
-
-        // const recommendedVideoIds = recommendedItems
-        //     .map(item => { item.id.videoId.trim()})
-        //     .filter(id => id && id.length > 0); 
-
-        // // Fetch statistics for recommended videos only if IDs are available
-        // let statsMap = {};
-        // if (recommendedVideoIds.length > 0) {
-        //     const statsResponse = await axios.get(YOUTUBE_API_URL, {
-        //         params: {
-        //             part: 'statistics',
-        //             id: recommendedVideoIds.join(','),
-        //             key: YOUTUBE_API_KEY,
-        //         },
-        //     });
-
-        //     statsResponse.data.items.forEach(statItem => {
-        //         statsMap[statItem.id] = statItem.statistics;
-        //     });
-        // }
-
+ 
         // Build recommended videos array with stats
         const recommendedVideos = recommendedItems.map(item => {  
             return {
