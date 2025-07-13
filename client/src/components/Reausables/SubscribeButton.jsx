@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from '../../../config';
+import { useNavigate } from "react-router-dom";
 
 const SubscribeButton = ({ channelId }) => {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
  
   useEffect(() => {  
 
@@ -15,8 +17,8 @@ const SubscribeButton = ({ channelId }) => {
           { withCredentials: true }
         );
         setSubscribed(res.data.subscribed);
-      } catch (error) {
-        console.error("Failed to check subscription:", error);
+      } catch (error) { 
+          console.error("Failed to check subscription:", error); 
       }
     };
 
@@ -39,7 +41,11 @@ const SubscribeButton = ({ channelId }) => {
         setSubscribed(true);
       }
     } catch (error) {
-      console.error("Subscription action failed:", error);
+      if(error?.response?.status === 401){
+        navigate('/login');
+      } else {
+        console.error("Subscription action failed:", error);
+      }
     } finally {
       setLoading(false);
     }

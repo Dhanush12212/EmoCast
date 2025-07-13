@@ -3,11 +3,13 @@ import { MdOutlineWatchLater } from "react-icons/md";
 import { PiShareFat } from "react-icons/pi"; 
 import axios from 'axios';
 import { API_URL } from '../../../config'
+import { useNavigate } from 'react-router-dom';
 
 const menuItemClasses = "flex gap-3 hover:bg-[#535353] cursor-pointer w-full px-3 py-2 items-center";
 
 function VideoMenu({ video, closeMenu}) {
 
+  const navigate = useNavigate();
   const handleWatchLater = async () => {
 
     if(!video) {
@@ -19,8 +21,7 @@ function VideoMenu({ video, closeMenu}) {
       videoId,
       title,
       thumbnailUrl,
-      channelId,
-      publishAt,
+      channelId, 
       duration,
       channelTitle,
       viewCount,
@@ -46,8 +47,12 @@ function VideoMenu({ video, closeMenu}) {
       });
       console.log("Added to Watch Later");
       closeMenu();
-    } catch(err) { 
-      console.log(err.response?.data?.message || 'Failed to add to Watch Later');
+    } catch (error) {
+        if (error?.response?.status === 401) {
+          navigate('/login');
+        } else {
+        console.log(err.response?.data?.message || 'Failed to add to Watch Later');
+      }
     }
   }
 

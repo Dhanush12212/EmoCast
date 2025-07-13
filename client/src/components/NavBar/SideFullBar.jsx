@@ -57,7 +57,7 @@ function SideFullBar() {
             <div 
               key={channel.channelId}
               onClick={() => navigate(`/channel/${channel.channelId}`)}
-              className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl'>
+              className='flex items-center gap-5 hover:bg-[#3D3D3D] p-3 rounded-xl cursor-pointer'>
               <img
                 src={channel.channelThumbnail}
                 alt="Profile"
