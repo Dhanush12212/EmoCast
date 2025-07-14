@@ -19,10 +19,10 @@ function Profile() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 ml-25 overflow-x-hidden">
+        <div className="flex-1 overflow-x-hidden">
 
           {/* Home Feed */}
-          <div className=""> 
+          <div> 
             <ProfileFeed/>
           </div>
         </div>

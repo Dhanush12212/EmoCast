@@ -23,7 +23,7 @@ function ProfileFeed() {
   };
 
   return (
-    <div className="min-h-screen w-full px-4 py-10 bg-[#0f0f0f] text-white flex flex-col items-center gap-12">
+    <div className="min-h-screen w-full py-10 bg-[#0f0f0f] text-white flex flex-col items-center gap-12">
 
       {/* Profile Card */}
       <div className="w-full max-w-5xl bg-[#1f1f1f] rounded-3xl p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-12 shadow-xl">
@@ -60,7 +60,7 @@ function ProfileFeed() {
       </div>
 
       {/* Watch Later Section */}
-      <div className=" mr-20 shadow-md"> 
+      <div className="mr-30 shadow-md"> 
         <WatchLater />
       </div>
     </div>

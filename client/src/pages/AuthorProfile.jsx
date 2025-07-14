@@ -52,14 +52,14 @@ function AuthorProfile() {
             <div className="ml-30 w-full px-10 pb-8">
               {/* Banner */}
               <div className="mt-4 rounded-xl overflow-hidden shadow-lg">
-                <img src={channel.banner} alt="Channel Banner" className="w-full h-60 object-cover rounded-xl" />
+                <img src={channel.banner} alt={channel.title} className="w-full h-60 object-cover rounded-xl" />
               </div>
 
               {/* Channel Info */}
               <div className="flex flex-col md:flex-row items-center gap-10 mt-6">
                 <img
                   src={channel.thumbnail}
-                  alt="Channel Avatar"
+                  alt={channel.title}
                   className="h-40 w-40 md:h-60 md:w-60 rounded-full border-2 border-white"
                 />
 

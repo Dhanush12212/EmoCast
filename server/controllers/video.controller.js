@@ -227,6 +227,7 @@ const searchVideos = asyncHandler(async (req, res) => {
         videoId,
         thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
         title: item.snippet?.title || 'No Title',
+        channelId: item.snippet.channelId,      
         channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
         channelThumbnail:
           item.snippet?.thumbnails?.high?.url ||

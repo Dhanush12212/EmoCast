@@ -72,7 +72,7 @@ const isSubscribed = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   const userId = req.user?.id; 
 
-  const user = await Channel.findOne({ userId  }); 
+  const user = await Channel.findOne({ userId }); 
 
   if (!user)  {
     user = await Channel.create({ userId, subscribedTo: [] }); 
@@ -130,15 +130,6 @@ const fetchSubscription = asyncHandler(async (req, res) => {
       channelId: channel.id, 
       channelTitle: channel.snippet?.title || "Unknown Channel",
       channelThumbnail: channel.snippet?.thumbnails?.high?.url || channel.snippet?.thumbnails?.medium?.url || channel.snippet?.thumbnails?.default?.url,
-      // thumbnailUrl: channel.snippet?.thumbnails?.high?.url || '',
-      // title: channel.snippet?.title || "No title",
-      // description: channel.snippet?.description || "No description available",
-      // publishDate: timeAgo(channel.snippet?.publishedAt || ''),
-      // publishAt: channel.snippet?.publishedAt || '',
-      // viewCount: formatNumber(channel.statistics?.viewCount ?? '0'),   
-      // duration: channel.contentDetails?.duration
-      //             ? parseDuration(channel.contentDetails.duration)
-      //             : '0:00',    
     })); 
 
     res.status(200).json({
@@ -151,9 +142,40 @@ const fetchSubscription = asyncHandler(async (req, res) => {
   } 
 });
 
+const fetchVideos = asyncHandler(async( req, res) => { 
+  const userId = req.user.id; 
+
+  try {
+    if (!userId) {
+      throw new ApiError(401, 'Unauthorized: User ID missing');
+    }
+
+    const userChannel = await Channel.findOne({ userId });
+
+    if (!userChannel || userChannel.subscribedTo.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No subscriptions found',
+        subscribedChannels: [],
+      });
+    } 
+
+    const videos = await Video.find({
+      userId: { $in: userChannel.subscribedTo },
+    }).sort({ createdAt: -1 }); 
+
+    res.status(200).json(videos);
+
+  } catch (error) {
+    console.error('Error fetching subscription videos:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+})
+
 export {
     Subscribe,
     Unsubscribe,
     isSubscribed,
-    fetchSubscription
+    fetchSubscription,
+    fetchVideos,
 }
