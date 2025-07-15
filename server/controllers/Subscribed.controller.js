@@ -10,6 +10,7 @@ import axios from 'axios';
 
 const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const PLAYLIST_API_URL = process.env.PLAYLIST_API_URL;
 
 const Subscribe = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
@@ -72,7 +73,7 @@ const isSubscribed = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   const userId = req.user?.id; 
 
-  const user = await Channel.findOne({ userId }); 
+  let user = await Channel.findOne({ userId }); 
 
   if (!user)  {
     user = await Channel.create({ userId, subscribedTo: [] }); 
@@ -142,6 +143,7 @@ const fetchSubscription = asyncHandler(async (req, res) => {
   } 
 });
 
+
 const fetchVideos = asyncHandler(async( req, res) => { 
   const userId = req.user.id; 
 
@@ -159,18 +161,61 @@ const fetchVideos = asyncHandler(async( req, res) => {
         subscribedChannels: [],
       });
     } 
+    
+    const channelIds = userChannel.subscribedTo;
 
-    const videos = await Video.find({
-      userId: { $in: userChannel.subscribedTo },
-    }).sort({ createdAt: -1 }); 
+    const { data: channelsData } = await axios.get(CHANNELS_API_URL, {
+      params: {
+        part: 'contentDetails',
+        id: channelIds.join(','),
+        key:YOUTUBE_API_KEY
+      },
+    });
 
-    res.status(200).json(videos);
+    const playlist = channelsData.items.map(
+      (item) => item.contentDetails?.relatedPlaylists?.uploads
+    );
+
+    const allVideos = [];
+
+    for(const playlistId of playlist) {
+      if(!playlistId) continue;
+
+      const { data: playlistData } = await axios.get(PLAYLIST_API_URL, {
+        params: {
+          part: 'snippet, contentDetails',
+          maxResults:100,
+          playlistId,
+          key:YOUTUBE_API_KEY
+        }
+      })
+
+      const videos = playlistData.items.map((item) => ({
+        videoId: item.contentDetails.videoId || '',
+        thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
+        title: item.snippet?.title || "No title",
+        description: item.snippet?.description || "No description available",
+        channelTitle: item.snippet?.channelTitle || "Unknown Channel",
+        channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+        publishDate: timeAgo(item.snippet?.publishedAt || ''),
+        publishAt: item.snippet?.publishedAt || '',
+        viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
+        duration: item.contentDetails?.duration
+              ? parseDuration(item.contentDetails.duration)
+              : '0:00',   
+        channelId: item.snippet.channelId,
+      }));
+
+      allVideos.push(...videos);
+    } 
+
+    res.status(200).json({success: true,videos: allVideos});
 
   } catch (error) {
     console.error('Error fetching subscription videos:', error);
     res.status(500).json({ error: 'Server error' });
   }
-})
+});
 
 export {
     Subscribe,
