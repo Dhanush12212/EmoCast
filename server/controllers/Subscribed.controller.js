@@ -11,6 +11,7 @@ import axios from 'axios';
 const CHANNELS_API_URL = process.env.CHANNELS_API_URL;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const PLAYLIST_API_URL = process.env.PLAYLIST_API_URL;
+const YOUTUBE_API_URL = process.env.YOUTUBE_API_URL;
 
 const Subscribe = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
@@ -190,8 +191,18 @@ const fetchVideos = asyncHandler(async( req, res) => {
         }
       })
 
-      const videos = playlistData.items.map((item) => ({
-        videoId: item.contentDetails.videoId || '',
+      const videoIds = playlistData.items.map(item => item.contentDetails.videoId).filter(Boolean);
+
+      const { data: videoDetailsData } = await axios.get(YOUTUBE_API_URL, {
+        params: {
+          part: 'snippet,contentDetails,statistics',
+          id: videoIds.join(','),
+          key: YOUTUBE_API_KEY
+        }
+      });
+
+      const videos = videoDetailsData.items.map((item) => ({
+        videoId: item.id,
         thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
         title: item.snippet?.title || "No title",
         description: item.snippet?.description || "No description available",
@@ -199,12 +210,13 @@ const fetchVideos = asyncHandler(async( req, res) => {
         channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
         publishAt: item.snippet?.publishedAt || '',
-        viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
+        viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
         duration: item.contentDetails?.duration
-              ? parseDuration(item.contentDetails.duration)
-              : '0:00',   
+                  ? parseDuration(item.contentDetails.duration)
+                  : '0:00',
         channelId: item.snippet.channelId,
       }));
+
 
       allVideos.push(...videos);
     } 

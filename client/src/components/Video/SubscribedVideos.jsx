@@ -20,7 +20,9 @@ function SubscribedVideos() {
       setError(null);
 
       try {
-        let response = await axios.get(`${API_URL}/subscribe/fetchVideos`); 
+        let response = await axios.get(`${API_URL}/subscribe/fetchVideos`, {
+          withCredentials: true
+        }); 
         setVideos(response.data.videos || []);
       } catch (error) {
         setError(error.response?.data?.message || 'Failed to fetch videos!!');
