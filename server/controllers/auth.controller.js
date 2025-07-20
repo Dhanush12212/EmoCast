@@ -5,7 +5,7 @@ import ApiError from '../utils/ApiError.utils.js';
 import ApiResponse from '../utils/ApiResponse.utils.js';
 import asyncHandler from '../utils/asyncHandler.utils.js';
 import { OAuth2Client } from 'google-auth-library'; 
-import sendTokenResponse from "../utils/authHelper.utils.js";
+import sendTokenResponse from "../utils/authHelper.utils.js"; 
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
