@@ -6,6 +6,7 @@ import { FaGoogle } from "react-icons/fa";
 import { PiSignOut } from "react-icons/pi";
 import axios from 'axios';
 import { API_URL } from '../../../config'; 
+import { useAuth } from '../Authentication/AuthContext'
 
 function Profile() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ function Profile() {
     <div className='h-auto bg-[#222222] lg:w-[300px] flex flex-col right-0 z-10 rounded-3xl left-0 '>
       <div className='flex gap-7 p-4'>
         <img
-          src={assets.Profile}
+          src={user?.profilePic || assets.Profile}
           alt="Profile"
           className="h-14 w-14 rounded-full object-cover cursor-pointer mt-2"
         />
@@ -43,15 +44,10 @@ function Profile() {
         <Link to='/login' className='flex gap-5 hover:bg-[#3E3E3E] rounded-xl p-3 items-center cursor-pointer'>
           <FaGoogle className='w-8 h-8'/>
           <span className='cursor-pointer'>Google Account</span>
-        </Link> 
-
-        <Link to='/register' className='flex gap-5 hover:bg-[#3E3E3E] rounded-xl p-3 items-center cursor-pointer'>
-          <PiSignOut className='w-8 h-8'/>
-          <span className='cursor-pointer'>Switch Account</span>
-        </Link> 
+        </Link>  
 
         <div onClick={handleLogout} className='flex gap-5 hover:bg-[#3E3E3E] rounded-xl p-3 items-center cursor-pointer'>
-          <MdOutlineSwitchAccount className='w-8 h-8'/>
+          <PiSignOut className='w-8 h-8'/>
           <span className='cursor-pointer'>Sign Out</span>
         </div> 
 

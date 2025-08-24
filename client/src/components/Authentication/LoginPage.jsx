@@ -35,11 +35,9 @@ function Login( { login }) {
       console.error("Login failed:", error.response?.data || error.message);
       setMessage({ text: "Login Failed. Check your credentials.", type: "error" });
     }
-  }; 
-  
+  };  
 
-//Google Authentication
-
+// Google Authentication 
   return (
     <div className="w-full h-screen relative flex items-center justify-center px-4"> 
 

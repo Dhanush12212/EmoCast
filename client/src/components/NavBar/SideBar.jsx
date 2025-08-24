@@ -2,13 +2,14 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import { GoHomeFill } from "react-icons/go";
 import { SiYoutubeshorts } from "react-icons/si";
-import { MdOutlineSubscriptions } from "react-icons/md"; 
+import { MdOutlineSubscriptions, MdOutlineWatchLater } from "react-icons/md"; 
 import { CgProfile } from "react-icons/cg";  
 
 export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/' },
   { icon: SiYoutubeshorts, label: "Shorts", path: '/shorts'},
   { icon: MdOutlineSubscriptions, label: "Subscription", path: '/subscription'},  
+  { icon: MdOutlineWatchLater, label: "Watch Later", path: '/watchLater' }, 
   { icon: CgProfile, label: "You", path:'/profile' },  
 ];
 
@@ -22,7 +23,6 @@ function SideBar() {
             </Link>  
             )  
         })} 
-
     </div>
   )
 }

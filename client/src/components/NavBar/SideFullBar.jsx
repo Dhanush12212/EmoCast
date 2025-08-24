@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'   
-import {sidebarItems, Channels} from '../../constants';
+import {sidebarItems} from '../../constants';
 import {Link} from 'react-router-dom'
 import axios from 'axios';
 import { API_URL } from '../../../config';

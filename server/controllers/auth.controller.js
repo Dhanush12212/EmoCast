@@ -43,7 +43,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!email || !password)
     throw new ApiError(400, "All fields are required!");
-
+  
   const existingUser = await User.findOne({ email });
   if (!existingUser)
     throw new ApiError(400, "No user found!");
@@ -98,7 +98,7 @@ const googleLogin = asyncHandler(async (req, res) => {
     audience: process.env.GOOGLE_CLIENT_ID,
   });
 
-  const payload = ticket.getPayload();
+  const payload = ticket.getPayload(); 
   const { email, name, picture, sub: googleId } = payload;
 
   let user = await User.findOne({ email });
@@ -110,6 +110,9 @@ const googleLogin = asyncHandler(async (req, res) => {
       profilePic: picture,
       password: null,
     });
+  } else if (!user.profilePic || user.profilePic !== picture) {
+    user.profilePic = picture;
+    await user.save();
   }
  
   return sendTokenResponse(user, 200, res, "Google Login Successful!");

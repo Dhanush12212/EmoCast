@@ -78,7 +78,7 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
         if (!videoId) {
             throw new ApiError(400, "Video ID parameter is required");
         }
- 
+        
         // Fetch main video details
         const response = await axios.get(YOUTUBE_API_URL, {
             params: {
