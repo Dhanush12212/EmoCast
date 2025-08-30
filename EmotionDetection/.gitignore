@@ -1,2 +1,8 @@
 images
-requirements.txt
+emotionmodel.json
+emotiondetector.json
+emotiondetector.keras
+facialemotionmodel.h5
+facialemotionmodel.json
+tempCodeRunnerFile.py
+realtimedetection.py
