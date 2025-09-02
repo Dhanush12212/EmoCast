@@ -21,8 +21,7 @@ function FilterBar({selectedCategory, onSelect}) {
       } catch(error) {
         console.log(error.response?.data?.message || 'Failed to fetch Categories!!');
       }
-    }
-
+    } 
     fetchCategories();
   }, []);
  

@@ -52,8 +52,7 @@ function VideoPlayer({ video }) {
         className="w-full h-[100%]"
         src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute`} 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerPolicy="strict-origin-when-cross-origin"
-        allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin" 
       ></iframe>
     </div>
 

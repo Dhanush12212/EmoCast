@@ -7,25 +7,15 @@ import { assets } from '../../assets/assets';
 import SideFullBar from './SideFullBar';
 import ProfileBar from './ProfileBar';
 import { useAuth } from '../Authentication/AuthContext';
-import { LuScanFace } from "react-icons/lu";
-import WebcamCapture from '../Video/WebcamCapture';
+import WebCamCapture from '../WebCam/WebCamCapture'
+
 
 function NavBar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [syncActive, setSyncActive] = useState(false);
-  const { user } = useAuth();
-  const webcamRef = useRef();
-
-  const handleCaptureClick = async () => {
-    const newState = !syncActive;
-    setSyncActive(newState);
-    if (webcamRef.current) {
-      await webcamRef.current.toggleSync(newState);
-    }
-  };
+  const [listening, setListening] = useState(false); 
+  const { user } = useAuth(); 
 
   const recognitionRef = useRef(null);
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -96,14 +86,17 @@ function NavBar() {
 
       {/* Right section */}
       <div className="flex items-center justify-end gap-10 w-[25%]">
-        <div
-          className={`p-4 h-18 cursor-pointer ${syncActive ? 'bg-red-600 rounded' : ''}`}
-          onClick={handleCaptureClick}
-        >
-          <LuScanFace className="w-8 h-8 text-white" />
-          <span className='text-lg'>{syncActive ? 'Stop' : 'Sync'}</span>
-        </div>
-        <WebcamCapture ref={webcamRef} className="h-20 w-20 rounded-2xl" />
+
+        {/* WebCam */}
+        <WebCamCapture
+          onEmotion={(data) => {
+            console.log("Detected emotion:", data.emotion);
+          }}
+        />
+        
+
+        {/* Profile */}
+
         <button onClick={() => setIsProfileOpen(!isProfileOpen)}>
           <img
             src={user?.profilePic || assets.Profile}

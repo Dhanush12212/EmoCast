@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
-# Load the full model directly from .h5
+# Load the model 
 model = load_model("facialemotionmodel.h5")
 
 # Load Haar cascade for face detection
@@ -12,8 +12,8 @@ face_cascade = cv2.CascadeClassifier(haar_file)
 # Preprocess input image
 def extract_features(image):
     feature = np.array(image)
-    feature = feature.reshape(1, 48, 48, 1)  # (batch, height, width, channels)
-    return feature / 255.0  # normalize
+    feature = feature.reshape(1, 48, 48, 1)  
+    return feature / 255.0  
 
 # Define emotion labels
 labels = {
@@ -38,7 +38,7 @@ while True:
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
     for (x, y, w, h) in faces:
-        roi = gray[y:y+h, x:x+w]  # region of interest (face)
+        roi = gray[y:y+h, x:x+w]   
         roi = cv2.resize(roi, (48, 48))  # resize to match model input
         img = extract_features(roi)
 
@@ -52,8 +52,7 @@ while True:
                     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
 
     cv2.imshow("Facial Emotion Recognition", frame)
-
-    # Press ESC to exit
+  
     if cv2.waitKey(1) & 0xFF == 27:
         break
 
