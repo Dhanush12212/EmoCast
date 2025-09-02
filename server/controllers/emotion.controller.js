@@ -1,40 +1,56 @@
+// detectEmotionController.js
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
+import { randomUUID } from "crypto";
 
-// Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const detectEmotion = (req, res) => {
-  const { image } = req.body;
+const scriptPath = path.join(__dirname, "../../EmotionDetection/detectEmotion.py");
+const py = spawn("python", [scriptPath]);
 
-  // Absolute path to Python script
-  const scriptPath = path.join(__dirname, "../../EmotionDetection/detectEmotion.py");
+const pending = new Map();
 
-  const py = spawn("python3", [scriptPath]);
-
-  let dataString = "";
-
-  py.stdout.on("data", (data) => {
-    dataString += data.toString();
-  });
-
-  py.stderr.on("data", (data) => {
-    console.error("Python error:", data.toString());
-  });
-
-  py.on("close", () => {
+// Handle ALL python responses in one place
+py.stdout.on("data", (data) => {
+  const lines = data.toString().trim().split("\n");
+  for (const line of lines) {
     try {
-      const result = JSON.parse(dataString);
-      res.json(result);
+      const msg = JSON.parse(line);
+      const { id, result, error } = msg;
+      if (pending.has(id)) {
+        if (error) pending.get(id).reject(error);
+        else pending.get(id).resolve(result);
+        pending.delete(id);
+      }
     } catch (err) {
-      console.error("Failed to parse Python response:", err);
-      res.status(500).json({ error: "Emotion detection failed" });
+      console.error("❌ Failed to parse Python output:", line, err);
     }
-  });
+  }
+});
 
-  // Send base64 image to Python script
-  py.stdin.write(JSON.stringify({ image }));
-  py.stdin.end();
+py.stderr.on("data", (data) => {
+  console.error("🐍 Python error:", data.toString());
+});
+
+function detectEmotion(image) {
+  return new Promise((resolve, reject) => {
+    const id = randomUUID();
+    pending.set(id, { resolve, reject });
+    py.stdin.write(JSON.stringify({ id, image }) + "\n");
+  });
+}
+
+// Controller
+export const detectEmotionRoute = async (req, res) => {
+  const { image } = req.body;
+  if (!image) return res.status(400).json({ error: "No image provided" });
+
+  try {
+    const result = await detectEmotion(image);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.toString() });
+  }
 };

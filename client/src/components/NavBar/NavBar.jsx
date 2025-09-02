@@ -87,12 +87,7 @@ function NavBar() {
       {/* Right section */}
       <div className="flex items-center justify-end gap-10 w-[25%]">
 
-        {/* WebCam */}
-        <WebCamCapture
-          onEmotion={(data) => {
-            console.log("Detected emotion:", data.emotion);
-          }}
-        />
+
         
 
         {/* Profile */}
