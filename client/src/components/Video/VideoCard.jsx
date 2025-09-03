@@ -6,7 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../Reausables/LoaderOrError';
 
-function VideoCard({ selectedCategory, category }) {
+function VideoCard({ selectedCategory, category, emotion }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -15,42 +15,43 @@ function VideoCard({ selectedCategory, category }) {
   const navigate = useNavigate();
   const { query } = useParams();
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true);
-      setError(null);
+useEffect(() => {
+  const fetchVideos = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        let response;
-        if (query) {
-          response = await axios.get(`${API_URL}/searchVideos/search`, {
-            params: { q: query }
-          });
-        } else if (selectedCategory) {
-          try {
-            response = await axios.get(`${API_URL}/allVideos/byCategory/${selectedCategory}`);
-          } catch (err) {
-            if (err.response?.status === 400) {
-              response = await axios.get(`${API_URL}/searchVideos/search`, {
-                params: { q: category }
-              });
-            } else {
-              throw err;
-            }
-          }
-        } else {
-          response = await axios.get(`${API_URL}/allVideos/videos`);
-        }
-        setVideos(response.data.videos || []);
-      } catch (error) {
-        setError(error.response?.data?.message || 'Failed to fetch videos!!');
-      } finally {
-        setLoading(false);
+    try { 
+      let url = `${API_URL}/allVideos/videos`;
+      let params = {};
+
+      if (emotion) {
+        url = `${API_URL}/fetchVideos`;
       }
-    };
+      
+      if (query) {
+        url = `${API_URL}/searchVideos/search`;
+        params = { q: query };
+      } else if (selectedCategory) {
+        url = `${API_URL}/allVideos/byCategory/${selectedCategory}`;
+        params = {};
+      } else if (category) {
+        url = `${API_URL}/searchVideos/search`;
+        params = { q: category };
+      }
+ 
+      const response = await axios.get(url, { params });
 
-    fetchVideos();
-  }, [query, selectedCategory, category]);
+      setVideos(response.data.videos || []);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch videos!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchVideos();
+}, [query, selectedCategory, category, emotion]);
+
 
   const handleMenuToggle = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
