@@ -6,6 +6,6 @@ import { verifyJWT } from '../middleware/auth.middleware.js'
 const router = Router();
 
 router.route('/detectEmotion').post(verifyJWT, detectEmotionRoute);
-router.post("/fetchEmotionVideos", verifyJWT, fetchVideosByEmotionRoute);
+router.route('/fetchEmotionVideos').get(verifyJWT, fetchVideosByEmotionRoute);
 
 export default router;

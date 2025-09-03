@@ -6,7 +6,7 @@ import { FaGoogle } from "react-icons/fa";
 import { PiSignOut } from "react-icons/pi";
 import axios from 'axios';
 import { API_URL } from '../../../config'; 
-import { useAuth } from '../Authentication/AuthContext'
+import { useAuth } from '../Contexts/AuthContext'
 
 function Profile() {
   const navigate = useNavigate();

@@ -5,8 +5,9 @@ import { API_URL } from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../Reausables/LoaderOrError';
+import { useEmotion } from '../Contexts/EmotionContext';
 
-function VideoCard({ selectedCategory, category, emotion }) {
+function VideoCard({ selectedCategory, category }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -14,6 +15,7 @@ function VideoCard({ selectedCategory, category, emotion }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { query } = useParams();
+  const { emotion, setEmotion } = useEmotion();
 
 useEffect(() => {
   const fetchVideos = async () => {
@@ -25,7 +27,16 @@ useEffect(() => {
       let params = {};
 
       if (emotion) {
-        url = `${API_URL}/fetchVideos`;
+        url = `${API_URL}/emotion/fetchEmotionVideos`;
+        params = { emotion: emotion.emotion };
+
+        if (!emotion || emotion.emotion === "unknown") {
+          console.log("Skipping video fetch, emotion is unknown");
+          setVideos([]); 
+          setLoading(false);
+          return;
+        }
+
       }
       
       if (query) {
@@ -39,7 +50,11 @@ useEffect(() => {
         params = { q: category };
       }
  
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, {
+        params,
+        withCredentials: true,
+      });
+
 
       setVideos(response.data.videos || []);
     } catch (err) {

@@ -81,7 +81,10 @@ const detectEmotionRoute = asyncHandler(async (req, res) => {
 
 //Fetching the video for the emotion
 const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
-  const { emotion } = req.body;
+const emotion = req.query.emotion;
+console.log("Emotion", emotion);
+
+  
   if (!emotion) return res.status(400).json({ error: "No emotion provided" });
 
   try {

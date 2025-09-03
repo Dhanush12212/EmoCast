@@ -4,13 +4,16 @@ import './index.css'
 import './tailwind.css'; 
 import App from './App.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from './components/Authentication/AuthContext.jsx';
+import { AuthProvider } from './components/Contexts/AuthContext.jsx';
+import { EmotionProvider } from './components/Contexts/EmotionContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider>
       <AuthProvider>
-        <App />
+        <EmotionProvider>
+          <App />
+        </EmotionProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   </StrictMode>,

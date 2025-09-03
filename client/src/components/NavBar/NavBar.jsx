@@ -6,7 +6,7 @@ import { FaRegBell } from 'react-icons/fa';
 import { assets } from '../../assets/assets';
 import SideFullBar from './SideFullBar';
 import ProfileBar from './ProfileBar';
-import { useAuth } from '../Authentication/AuthContext';
+import { useAuth } from '../Contexts/AuthContext';
 import WebCamCapture from '../WebCam/WebCamCapture'
 
 

@@ -2,12 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { LuScanFace } from "react-icons/lu";
 import axios from "axios"; 
 import { API_URL } from '../../../config';
+import { useEmotion } from '../Contexts/EmotionContext'
 
 function WebCamCapture({ onEmotion }) {
   const [syncActive, setSyncActive] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const intervalRef = useRef(null);
+
+  const { emotion, setEmotion } = useEmotion();
 
   // Start webcam
   useEffect(() => {
@@ -22,12 +25,12 @@ function WebCamCapture({ onEmotion }) {
           // Ensure video starts playing
           videoRef.current.onloadedmetadata = () => {
             videoRef.current.play()
-              .then(() => console.log("✅ Video started playing"))
-              .catch(err => console.error("❌ Video play error:", err));
+              .then(() => console.log("Video started playing"))
+              .catch(err => console.error("Video play error:", err));
           };
         }
       } catch (err) {
-        console.error("❌ Error accessing webcam:", err);
+        console.error("Error accessing webcam:", err);
       }
     })();
 
@@ -86,6 +89,9 @@ function WebCamCapture({ onEmotion }) {
       );
 
       const data = response.data;
+      if (data?.emotion) {
+        setEmotion(data.emotion); 
+      }
 
       if (onEmotion) {
         if (data && data.emotion) {
