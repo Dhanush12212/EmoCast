@@ -27,7 +27,7 @@ function Profile() {
     <div className='h-auto bg-[#222222] lg:w-[300px] flex flex-col right-0 z-10 rounded-3xl left-0 '>
       <div className='flex gap-7 p-4'>
         <img
-          src={user?.profilePic || assets.Profile}
+          src={ assets.Profile || user?.profilePic}
           alt="Profile"
           className="h-14 w-14 rounded-full object-cover cursor-pointer mt-2"
         />

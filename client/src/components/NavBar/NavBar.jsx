@@ -94,7 +94,7 @@ function NavBar() {
 
         <button onClick={() => setIsProfileOpen(!isProfileOpen)}>
           <img
-            src={user?.profilePic || assets.Profile}
+            src={ assets.Profile || user?.profilePic }
             alt="Profile"
             className="h-12 w-12 rounded-full object-cover cursor-pointer border"
           />

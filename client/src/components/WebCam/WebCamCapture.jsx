@@ -110,11 +110,11 @@ function WebCamCapture({ onEmotion }) {
     <div className="flex flex-col items-center">
       {/* Sync Button */}
       <div
-        className={`flex flex-col items-center justify-center px-5 ml-2 py-2 cursor-pointer transition-all duration-300 
+        className={`flex flex-col items-center justify-center px-5 py-2 cursor-pointer transition-all duration-300 
           ${
             syncActive
               ? "bg-green-600 rounded-2xl shadow-lg transform scale-105 animate-pulse"
-              : "bg-[#0F0F0F] rounded-2xl hover:bg-gray-600"
+              : "bg-transparent rounded-2xl "
           }`}
         onClick={handleCaptureClick}  
         title={syncActive ? "Stop Sync" : "Start Sync"}
