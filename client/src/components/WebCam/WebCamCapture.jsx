@@ -140,7 +140,7 @@ function WebCamCapture({ onEmotion }) {
           autoPlay 
           muted 
           playsInline 
-          className="border border-green-500 w-28 h-28 rounded-lg"
+          className="border border-green-500 w-26  rounded-lg"
         />
       </div>
 
