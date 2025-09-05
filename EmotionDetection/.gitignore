@@ -1,7 +1,5 @@
 images
 emotionmodel.json
 emotiondetector.json
-emotiondetector.keras
-facialemotionmodel.h5
-facialemotionmodel.json
+emotiondetector.keras 
 tempCodeRunnerFile.py 
