@@ -19,9 +19,19 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static("public"));
 
-app.use(cors({ 
-    origin: process.env.FRONTEND_URL ,
-    credentials: true
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://emo-cast.vercel.app"
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true
 }));
 
 const PORT = process.env.PORT || 8000;
