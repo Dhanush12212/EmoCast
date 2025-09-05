@@ -26,18 +26,16 @@ app.use(cors({
       "https://emo-cast.vercel.app"
     ];
 
-    if (
-      !origin ||
-      allowed.includes(origin) ||
-      /\.vercel\.app$/.test(new URL(origin).hostname)
-    ) {
+    if (!origin || allowed.includes(origin)) {
       callback(null, true);
     } else {
+      console.error("❌ Blocked by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
 }));
+
 
 
 const PORT = process.env.PORT || 8000;
