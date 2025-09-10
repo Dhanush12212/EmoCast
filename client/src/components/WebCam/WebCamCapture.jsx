@@ -9,13 +9,11 @@ function WebCamCapture({ onEmotion }) {
   const [syncActive, setSyncActive] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const intervalRef = useRef(null);
   const navigate = useNavigate();
-
   const { emotion, setEmotion } = useEmotion();
- 
+
   const isLoggedIn = Boolean(localStorage.getItem("user"));  
- 
+
   useEffect(() => {
     let stream;
     if (!syncActive) return;
@@ -40,65 +38,84 @@ function WebCamCapture({ onEmotion }) {
       }
     };
   }, [syncActive]);
- 
+
   const handleCaptureClick = () => {
     if (!isLoggedIn) {
       navigate("/login");  
       return;
     }
 
-    const newState = !syncActive;
-    setSyncActive(newState);
-
-    if (newState) startSendingFrames();
-    else stopSendingFrames();
+    if (!syncActive) {
+      setSyncActive(true);
+      captureAndSendThreeFrames();
+    } else {
+      stopCamera();
+      setSyncActive(false);
+    }
   };
 
-  const startSendingFrames = () => {
-    intervalRef.current = setInterval(sendFrame, 3000); 
-
-    setTimeout(() => {
-      stopSendingFrames();
-      setSyncActive(false);  
-    }, 6000);
-  };
-
-  const stopSendingFrames = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-  };
-
-  const sendFrame = async () => {
+  const captureFrame = () => {
     const video = videoRef.current;
-    if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) return null;
 
     const canvas = canvasRef.current || document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return null;
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataURL = canvas.toDataURL("image/jpeg", 0.9);
+    return canvas.toDataURL("image/jpeg", 0.9);
+  };
 
-    try { 
+  const captureAndSendThreeFrames = async () => {
+    const frames = [];
+    for (let i = 0; i < 3; i++) {
+      const frame = captureFrame();
+      if (frame) frames.push(frame);
+      await new Promise(resolve => setTimeout(resolve, 500)); // 0.5s gap between frames
+    }
+
+    if (frames.length === 0) {
+      console.error("No frames captured");
+      return;
+    }
+
+    try {
       const response = await axios.post(
         `${API_URL}/emotion/detectEmotion`,
-        { image: dataURL },
+        { images: frames },
         { withCredentials: true }
       );
-
+    
       const data = response.data;
       if (data?.emotion) {
-        setEmotion(data.emotion); 
+        setEmotion(data.emotion);
       }
-
+    
       if (onEmotion) {
         onEmotion(data?.emotion ? data : { emotion: "unknown", confidence: 0.0 });
       }
     } catch (err) {
-      console.error("Error sending frame:", err);
-      if (onEmotion) onEmotion({ emotion: "error", confidence: 0.0 });
+      if (err.response?.status === 422) {
+        console.warn("No emotion detected from 3 frames"); 
+        if (onEmotion) onEmotion({ emotion: "none", confidence: 0.0 });
+      } else {
+        console.error("Error sending frames:", err);
+        if (onEmotion) onEmotion({ emotion: "error", confidence: 0.0 });
+      }
+    } finally {
+      stopCamera();
+      setSyncActive(false);
+    }
+
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject) {
+      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
     }
   };
 
@@ -140,4 +157,4 @@ function WebCamCapture({ onEmotion }) {
   );
 }
 
-export default WebCamCapture; 
+export default WebCamCapture;

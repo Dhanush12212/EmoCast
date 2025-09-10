@@ -15,58 +15,52 @@ function VideoCard({ selectedCategory, category }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { query } = useParams();
-  const { emotion, setEmotion } = useEmotion();
+  const { emotion } = useEmotion(); // emotion now contains { emotion, videos } after capture
 
-useEffect(() => {
-  const fetchVideos = async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      setError(null);
 
-    try { 
-      let url = `${API_URL}/allVideos/videos`;
-      let params = {};
-
-      if (emotion) {
-        url = `${API_URL}/emotion/fetchEmotionVideos`;
-        params = { emotion: emotion.emotion };
-
-        if (!emotion || emotion.emotion === "unknown") {
-          console.log("Skipping video fetch, emotion is unknown");
-          setVideos([]); 
+      try {
+        // 🔹 If emotion + videos already provided by WebCamCapture -> use them
+        if (emotion && emotion.emotion && emotion.videos) {
+          if (emotion.emotion === "unknown") {
+            console.log("Skipping video fetch, emotion is unknown");
+            setVideos([]);
+            setLoading(false);
+            return;
+          }
+          setVideos(emotion.videos);
           setLoading(false);
           return;
         }
 
+        // 🔹 Otherwise fetch based on query/category
+        let url = `${API_URL}/allVideos/videos`;
+        let params = {};
+
+        if (query) {
+          url = `${API_URL}/searchVideos/search`;
+          params = { q: query };
+        } else if (selectedCategory) {
+          url = `${API_URL}/allVideos/byCategory/${selectedCategory}`;
+        } else if (category) {
+          url = `${API_URL}/searchVideos/search`;
+          params = { q: category };
+        }
+
+        const response = await axios.get(url, { params, withCredentials: true });
+        setVideos(response.data.videos || []);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch videos!');
+      } finally {
+        setLoading(false);
       }
-      
-      if (query) {
-        url = `${API_URL}/searchVideos/search`;
-        params = { q: query };
-      } else if (selectedCategory) {
-        url = `${API_URL}/allVideos/byCategory/${selectedCategory}`;
-        params = {};
-      } else if (category) {
-        url = `${API_URL}/searchVideos/search`;
-        params = { q: category };
-      }
- 
-      const response = await axios.get(url, {
-        params,
-        withCredentials: true,
-      });
+    };
 
-
-      setVideos(response.data.videos || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch videos!');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchVideos();
-}, [query, selectedCategory, category, emotion]);
-
+    fetchVideos();
+  }, [query, selectedCategory, category, emotion]);
 
   const handleMenuToggle = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
@@ -87,19 +81,7 @@ useEffect(() => {
     <>
       <LoaderOrError loading={loading} error={error} />
       {!loading && !error && (
-        <div
-          className="
-            grid
-            grid-cols-1
-            sm:grid-cols-2
-            md:grid-cols-2
-            lg:grid-cols-3
-            xl:grid-cols-4
-            gap-6
-            mt-6
-            px-3 sm:px-4 lg:px-6
-          "
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6 px-3 sm:px-4 lg:px-6">
           {videos.length === 0 ? (
             <p className="text-center text-gray-400 text-lg mt-10 italic">
               {query ? `No videos found matching "${query}"` : 'No videos available.'}

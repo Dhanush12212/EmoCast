@@ -1,38 +1,18 @@
-import sys, json, base64, cv2, numpy as np, os
-from keras.models import load_model
+def detect_emotion(images_base64_list):
+    frame_results = []
+    for img in images_base64_list:
+        result = detect_single_frame(img)
+        frame_results.append(result)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model = load_model(os.path.join(BASE_DIR, "facialemotionmodel.h5"))
-haar_file = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-face_cascade = cv2.CascadeClassifier(haar_file)
+    if not frame_results:
+        return {"error": "No frames processed", "status": 400}
 
-labels = {
-    0: 'angry', 1: 'disgust', 2: 'fear',
-    3: 'happy', 4: 'neutral', 5: 'sad', 6: 'surprise'
-}
+    # If all 3 results are unknown → return error with status
+    if all(r["emotion"] == "unknown" for r in frame_results):
+        return {"error": "No emotion detected", "status": 422}
 
-def extract_features(image):
-    feature = np.array(image).reshape(1, 48, 48, 1) / 255.0
-    return feature
-
-def detect_emotion(image_base64):
-    if "," in image_base64:
-        image_base64 = image_base64.split(",")[1]
-
-    img_bytes = base64.b64decode(image_base64)
-    frame = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
-
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-
-    best_result = {"emotion": "unknown", "confidence": 0.0}
-    for (x,y,w,h) in faces:
-        roi = cv2.resize(gray[y:y+h, x:x+w], (48,48))
-        pred = model.predict(extract_features(roi), verbose=0)
-        label = labels[pred.argmax()]
-        conf = float(np.max(pred))
-        if conf > best_result["confidence"]:
-            best_result = {"emotion": label, "confidence": conf}
+    # Otherwise, pick the most confident result
+    best_result = max(frame_results, key=lambda r: r["confidence"])
     return best_result
 
 # Keep service alive
@@ -40,10 +20,30 @@ for line in sys.stdin:
     try:
         data = json.loads(line)
         req_id = data.get("id")
-        image = data.get("image")
-        result = detect_emotion(image)
-        sys.stdout.write(json.dumps({"id": req_id, "result": result}) + "\n")
+        images = data.get("images")
+
+        if not images:
+            result = {"error": "No images provided", "status": 400}
+        else:
+            result = detect_emotion(images)
+
+        if "error" in result:
+            sys.stdout.write(json.dumps({
+                "id": req_id,
+                "error": result["error"],
+                "status": result.get("status", 500)
+            }) + "\n")
+        else:
+            sys.stdout.write(json.dumps({
+                "id": req_id,
+                "result": result
+            }) + "\n")
+
         sys.stdout.flush()
     except Exception as e:
-        sys.stdout.write(json.dumps({"id": data.get("id"), "error": str(e)}) + "\n")
+        sys.stdout.write(json.dumps({
+            "id": data.get("id"),
+            "error": str(e),
+            "status": 500
+        }) + "\n")
         sys.stdout.flush()
