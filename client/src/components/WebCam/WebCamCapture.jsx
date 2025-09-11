@@ -1,8 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuScanFace } from "react-icons/lu";
-import axios from "axios"; 
-import { API_URL } from "../../../config";
-import { useEmotion } from "../Contexts/EmotionContext";
 import { useNavigate } from "react-router-dom";
 
 function WebCamCapture({ onEmotion }) {
@@ -10,7 +7,6 @@ function WebCamCapture({ onEmotion }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
-  const { emotion, setEmotion } = useEmotion();
 
   const isLoggedIn = Boolean(localStorage.getItem("user"));  
 
@@ -47,7 +43,7 @@ function WebCamCapture({ onEmotion }) {
 
     if (!syncActive) {
       setSyncActive(true);
-      captureAndSendThreeFrames();
+      captureThreeFrames();
     } else {
       stopCamera();
       setSyncActive(false);
@@ -66,50 +62,43 @@ function WebCamCapture({ onEmotion }) {
     if (!ctx) return null;
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.9);
+    return canvas.toDataURL("image/jpeg", 0.7);
   };
 
-  const captureAndSendThreeFrames = async () => {
-    const frames = [];
-    for (let i = 0; i < 3; i++) {
-      const frame = captureFrame();
-      if (frame) frames.push(frame);
-      await new Promise(resolve => setTimeout(resolve, 500)); // 0.5s gap between frames
-    }
-
-    if (frames.length === 0) {
-      console.error("No frames captured");
+  const captureThreeFrames = async () => {
+    const video = videoRef.current;
+    if (!video) {
+      console.error("Video element not found");
       return;
     }
 
-    try {
-      const response = await axios.post(
-        `${API_URL}/emotion/detectEmotion`,
-        { images: frames },
-        { withCredentials: true }
-      );
-    
-      const data = response.data;
-      if (data?.emotion) {
-        setEmotion(data.emotion);
-      }
-    
-      if (onEmotion) {
-        onEmotion(data?.emotion ? data : { emotion: "unknown", confidence: 0.0 });
-      }
-    } catch (err) {
-      if (err.response?.status === 422) {
-        console.warn("No emotion detected from 3 frames"); 
-        if (onEmotion) onEmotion({ emotion: "none", confidence: 0.0 });
-      } else {
-        console.error("Error sending frames:", err);
-        if (onEmotion) onEmotion({ emotion: "error", confidence: 0.0 });
-      }
-    } finally {
-      stopCamera();
-      setSyncActive(false);
+    if (video.readyState < 2) {  
+      console.warn("Video not ready yet, waiting...");
+      await new Promise(resolve => {
+        video.onloadeddata = resolve;
+      });
     }
 
+    const frames = [];
+    for (let i = 0; i < 3; i++) {
+      const frame = captureFrame();
+      if (frame) {
+        frames.push(frame); 
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    console.log("Captured Frames:", frames);
+
+    if (frames.length === 0) {
+      console.error("No frames captured");
+    } else if (onEmotion) {
+      // Pass frames to parent (parent will handle API call or anything else)
+      onEmotion(frames);
+    }
+
+    stopCamera();
+    setSyncActive(false);
   };
 
   const stopCamera = () => {

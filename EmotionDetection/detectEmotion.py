@@ -1,3 +1,15 @@
+import sys
+import json
+
+# Dummy function - replace with your actual ML detection
+def detect_single_frame(img_base64):
+    # Example: returns fake results
+    import random
+    emotions = ["happy", "sad", "neutral", "angry", "surprised", "unknown"]
+    emotion = random.choice(emotions)
+    confidence = round(random.uniform(0.5, 0.99), 2)
+    return {"emotion": emotion, "confidence": confidence}
+
 def detect_emotion(images_base64_list):
     frame_results = []
     for img in images_base64_list:
@@ -7,13 +19,15 @@ def detect_emotion(images_base64_list):
     if not frame_results:
         return {"error": "No frames processed", "status": 400}
 
-    # If all 3 results are unknown → return error with status
     if all(r["emotion"] == "unknown" for r in frame_results):
         return {"error": "No emotion detected", "status": 422}
 
-    # Otherwise, pick the most confident result
     best_result = max(frame_results, key=lambda r: r["confidence"])
-    return best_result
+
+    return {
+        "frames": frame_results,   # ✅ all frames
+        "best": best_result        # ✅ most confident result
+    }
 
 # Keep service alive
 for line in sys.stdin:

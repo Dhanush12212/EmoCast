@@ -36,7 +36,7 @@ function ProfileFeed() {
       {/* Profile Card */}
       <div className="w-full max-w-5xl bg-[#1f1f1f] rounded-3xl p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-12 shadow-xl">
         <img
-          src={user?.profilePic || assets.defaultProfilePic}
+          src={user?.profilePic || assets.Profile}
           alt="Profile"
           className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white object-cover shadow-lg text-center"
         />

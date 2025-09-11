@@ -2,15 +2,13 @@ import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
-import dotenv from "dotenv"
-dotenv.config({
-    path:'./.env'
-})
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
 
-import ApiError from "../utils/ApiError.utils.js" 
-import { formatNumber, timeAgo, parseDuration } from '../utils/Formatters.utils.js';
+import ApiError from "../utils/ApiError.utils.js";
+import { formatNumber, timeAgo, parseDuration } from "../utils/Formatters.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
-import axios from 'axios';
+import axios from "axios";
 
 const SEARCH_API_URL = process.env.SEARCH_API_URL;
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -24,12 +22,10 @@ const py = spawn("python", [scriptPath]);
 
 const pending = new Map();
 
-
 function detectEmotion(images) {
   return new Promise((resolve, reject) => {
     const id = randomUUID();
     pending.set(id, { resolve, reject });
-    // send list of images instead of single image
     py.stdin.write(JSON.stringify({ id, images }) + "\n");
   });
 }
@@ -40,9 +36,24 @@ py.stdout.on("data", (data) => {
     try {
       const msg = JSON.parse(line);
       const { id, result, error, status } = msg;
+
       if (pending.has(id)) {
-        if (error) pending.get(id).reject({ message: error, status });
-        else pending.get(id).resolve(result);
+        if (error) {
+          pending.get(id).reject({ message: error, status });
+        } else {
+          // ✅ Log all detected emotions per frame
+          if (result.frames) {
+            console.log("Detected emotions per frame:");
+            result.frames.forEach((frame, index) => {
+              console.log(
+                `Frame ${index + 1}: ${frame.emotion} (confidence: ${frame.confidence})`
+              );
+            });
+            console.log("Best result:", result.best);
+          }
+
+          pending.get(id).resolve(result);
+        }
         pending.delete(id);
       }
     } catch (err) {
@@ -77,9 +88,7 @@ const detectEmotionRoute = asyncHandler(async (req, res) => {
   }
 });
 
-
-
-// Fetching videos based on emotion
+// Fetch videos by emotion
 const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
   const emotion = req.query.emotion;
   console.log("Emotion:", emotion);
@@ -145,7 +154,7 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       emotion,
       videos,
       timestamp: new Date().toISOString(),
-          });
+    });
   } catch (error) {
     throw new ApiError(
       error.response?.status || 500,
