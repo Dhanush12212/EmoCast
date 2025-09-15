@@ -56,22 +56,7 @@ function WebCamCapture({ onEmotion }) {
       check();
     });
   };
-
-  const handleCaptureClick = async () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-
-    if (syncActive || isCapturing) return;
-
-    setSyncActive(true);
-    setIsCapturing(true);
-    await waitForVideo();
-    captureThreeFrames();
-  };
-
-  // Capture one frame
+ 
   const captureFrame = () => {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
@@ -86,26 +71,22 @@ function WebCamCapture({ onEmotion }) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-    console.log(`🎥 Captured frame (${canvas.width}x${canvas.height}) length: ${dataUrl.length}`);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.5);
+    console.log(
+      `Captured frame (${canvas.width}x${canvas.height}) length: ${dataUrl.length}`
+    );
     return dataUrl;
   };
 
-  // Capture 3 frames
   const captureThreeFrames = async () => {
     const frames = [];
+
     for (let i = 0; i < 3; i++) {
       const frame = captureFrame();
-      if (frame) {
-        frames.push(frame);
-        console.log(`🖼️ Frame ${i + 1}:`, frame.substring(0, 100) + "...");
-      }
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (frame) frames.push(frame);
+      await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
-    console.log("✅ Frames captured:", frames.length);
-
-    // ⏹ Stop camera immediately after capturing
     stopCamera();
     setSyncActive(false);
     setIsCapturing(false);
@@ -116,28 +97,42 @@ function WebCamCapture({ onEmotion }) {
     }
 
     try {
-      console.log("📡 Sending frames to server...");
       const response = await axios.post(
         `${API_URL}/emotion/detectEmotion`,
-        { images: frames }, // ✅ backend expects { images: [...] }
+        { images: frames },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
-      console.log("📡 Server response:", response.data);
+      console.log("Server response:", response.data.emotion);
 
       if (onEmotion) {
         onEmotion(
           response.data?.emotion
-            ? response.data
+            ? response.data.emotion
             : { emotion: "unknown", confidence: 0.0 }
         );
       }
     } catch (err) {
-      console.error("❌ Error sending frames:", err);
+      console.error(" Error sending frames:", err);
       if (onEmotion) onEmotion({ emotion: "error", confidence: 0.0 });
     }
+  };
+
+  // Handle click
+  const handleCaptureClick = async () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    if (syncActive || isCapturing) return;
+
+    setSyncActive(true);
+    setIsCapturing(true);
+    await waitForVideo();
+    captureThreeFrames();  
   };
 
   // Stop webcam completely

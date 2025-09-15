@@ -15,28 +15,25 @@ function VideoCard({ selectedCategory, category }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { query } = useParams();
-  const { emotion } = useEmotion(); // emotion now contains { emotion, videos } after capture
+  const { emotion } = useEmotion(); // ✅ Emotion context (best emotion from webcam)
 
   useEffect(() => {
     const fetchVideos = async () => {
       setLoading(true);
       setError(null);
 
-      try {
-        // 🔹 If emotion + videos already provided by WebCamCapture -> use them
-        if (emotion && emotion.emotion && emotion.videos) {
-          if (emotion.emotion === "unknown") {
-            console.log("Skipping video fetch, emotion is unknown");
-            setVideos([]);
-            setLoading(false);
-            return;
-          }
-          setVideos(emotion.videos);
+      try { 
+        if (emotion && typeof emotion === "string" && emotion !== "unknown" && emotion !== "none") {
+          console.log("Fetching videos for emotion:", emotion);
+          const response = await axios.get(
+            `${API_URL}/emotion/fetchVideosByEmotion`,
+            { params: { emotion }, withCredentials: true }
+          );
+          setVideos(response.data.videos || []);
           setLoading(false);
           return;
         }
-
-        // 🔹 Otherwise fetch based on query/category
+ 
         let url = `${API_URL}/allVideos/videos`;
         let params = {};
 
@@ -60,8 +57,7 @@ function VideoCard({ selectedCategory, category }) {
     };
 
     fetchVideos();
-  }, [query, selectedCategory, category, emotion]);
-
+  }, [query, selectedCategory, category, emotion]);  
   const handleMenuToggle = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
   };
@@ -84,7 +80,11 @@ function VideoCard({ selectedCategory, category }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6 px-3 sm:px-4 lg:px-6">
           {videos.length === 0 ? (
             <p className="text-center text-gray-400 text-lg mt-10 italic">
-              {query ? `No videos found matching "${query}"` : 'No videos available.'}
+              {query
+                ? `No videos found matching "${query}"`
+                : emotion && emotion !== "unknown" && emotion !== "none"
+                ? `No videos found for mood "${emotion}"`
+                : 'No videos available.'}
             </p>
           ) : (
             videos.map((video) => (

@@ -18,82 +18,148 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const scriptPath = path.join(__dirname, "../../EmotionDetection/detectEmotion.py");
-const py = spawn("python", [scriptPath]);
 
+let py = null;
 const pending = new Map();
+let restarting = false;
 
-function detectEmotion(images) {
-  return new Promise((resolve, reject) => {
-    const id = randomUUID();
-    pending.set(id, { resolve, reject });
-    py.stdin.write(JSON.stringify({ id, images }) + "\n");
+function startPython() {
+  py = spawn("python", [scriptPath], { stdio: ["pipe", "pipe", "pipe"] });
+  attachPythonListeners();
+  console.log("Python process started (PID:", py.pid, ")");
+}
+
+function restartPython() {
+  if (restarting) return;
+  restarting = true;
+
+  setTimeout(() => {
+    startPython();
+    restarting = false;
+  }, 1000);
+}
+
+function attachPythonListeners() {
+  py.stdout.on("data", (data) => {
+    const lines = data.toString().trim().split("\n");
+    for (const line of lines) {
+      try {
+        const msg = JSON.parse(line);
+        const { id, result, error, status } = msg;
+
+        if (pending.has(id)) {
+          if (error) {
+            pending.get(id).reject(new ApiError(status || 500, error));
+          } else {
+            pending.get(id).resolve(result);
+          }
+          pending.delete(id);
+        }
+      } catch (err) {
+        console.error("Failed to parse Python output:", line);
+        console.error("Raw data from Python:", data.toString());
+      }
+    }
+  });
+
+  py.stderr.on("data", (data) => {
+    console.error("🐍 Python stderr:", data.toString().trim());
+  });
+
+  py.on("exit", (code, signal) => {
+    console.error(`🐍 Python exited (code: ${code}, signal: ${signal})`);
+    for (const [id, { reject }] of pending) {
+      reject(new ApiError(500, "Python process crashed"));
+    }
+    pending.clear();
+    restartPython();
   });
 }
 
-py.stdout.on("data", (data) => {
-  const lines = data.toString().trim().split("\n");
-  for (const line of lines) {
+startPython();
+
+function detectEmotion(images) {
+  return new Promise((resolve, reject) => {
+    if (!py || py.exitCode !== null || !py.stdin.writable) {
+      return reject(new ApiError(500, "Python process not available"));
+    }
+
+    const id = randomUUID();
+    pending.set(id, { resolve, reject });
+
+    const payload = JSON.stringify({ id, images }) + "\n";
+
     try {
-      const msg = JSON.parse(line);
-      const { id, result, error, status } = msg;
-
-      if (pending.has(id)) {
-        if (error) {
-          pending.get(id).reject({ message: error, status });
-        } else {
-          // ✅ Log all detected emotions per frame
-          if (result.frames) {
-            console.log("Detected emotions per frame:");
-            result.frames.forEach((frame, index) => {
-              console.log(
-                `Frame ${index + 1}: ${frame.emotion} (confidence: ${frame.confidence})`
-              );
-            });
-            console.log("Best result:", result.best);
-          }
-
-          pending.get(id).resolve(result);
+      py.stdin.write(payload, (err) => {
+        if (err) {
+          console.error("Failed to write to Python stdin:", err);
+          pending.delete(id);
+          reject(new ApiError(500, "Failed to communicate with Python"));
         }
+      });
+    } catch (err) {
+      console.error("Exception writing to Python:", err);
+      pending.delete(id);
+      reject(new ApiError(500, "Python communication error"));
+    }
+ 
+    setTimeout(() => {
+      if (pending.has(id)) {
+        pending.get(id).reject(new ApiError(504, "Python response timeout"));
         pending.delete(id);
       }
-    } catch (err) {
-      console.error("Failed to parse Python output:", line, err);
-    }
-  }
-});
+    }, 10000);
+  });
+}
 
+ 
 const detectEmotionRoute = asyncHandler(async (req, res) => {
-  const { images } = req.body;
+  let { image, images } = req.body;
+
+  // Normalize: wrap single frame into array
+  if (image && !images) images = [image];
   if (!images || !Array.isArray(images) || images.length === 0) {
-    return res.status(400).json({ error: "No images provided" });
+    return res.status(400).json({ error: "No image(s) provided" });
   }
+
+  console.log(`📸 Received ${images.length} frame(s) in route`);
 
   try {
-    const emotion = await detectEmotion(images);
+    const result = await detectEmotion(images);
 
-    if (!emotion) {
-      throw new ApiError(422, "No emotion detected");
+    let best = result.best || { emotion: "unknown", confidence: 0.0 };
+
+    // Only accept if confidence > 0.2
+    if (!best.emotion || best.confidence <= 0.2) {
+      best = { emotion: "unknown", confidence: 0.0 };
     }
+
+    console.log("Best result:", best);
 
     return res.status(200).json({
       success: true,
-      emotion,
+      emotion: best,
+      frames: result.frames || [],
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    throw new ApiError(
-      error.status || error.response?.status || 500,
-      error.message || "Error detecting emotion"
-    );
+    console.error("Error in detectEmotionRoute:", error.message);
+    return res.status(error.status || 500).json({
+      success: false,
+      error: error.message || "Error detecting emotion",
+    });
   }
 });
 
-// Fetch videos by emotion
-const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
-  const emotion = req.query.emotion;
-  console.log("Emotion:", emotion);
 
-  if (!emotion) return res.status(400).json({ error: "No emotion provided" });
+const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
+  const { emotion } = req.query;
+
+  console.log("Final Best Emotion:", emotion);
+
+  if (!emotion || emotion.toLowerCase() === "unknown" || emotion.toLowerCase() === "none") {
+    return res.status(400).json({ error: "No valid best emotion provided" });
+  }
 
   try {
     const searchResponse = await axios.get(SEARCH_API_URL, {
@@ -107,17 +173,11 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       },
     });
 
-    if (!searchResponse?.data?.items) {
-      throw new ApiError(404, "No videos found");
-    }
+    const items = searchResponse?.data?.items || [];
+    if (items.length === 0) throw new ApiError(404, `No videos for ${emotion}`);
 
-    const videoIds = searchResponse.data.items
-      .map((item) => item.id.videoId)
-      .filter(Boolean);
-
-    if (videoIds.length === 0) {
-      throw new ApiError(404, "No valid video IDs found");
-    }
+    const videoIds = items.map((item) => item.id.videoId).filter(Boolean);
+    if (videoIds.length === 0) throw new ApiError(404, "No valid video IDs");
 
     const detailsResponse = await axios.get(YOUTUBE_API_URL, {
       params: {
@@ -127,39 +187,33 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       },
     });
 
-    const videos = detailsResponse.data.items.map((item) => {
-      const channelId = item.snippet.channelId;
-      return {
-        videoId: item.id,
-        thumbnailUrl: item.snippet?.thumbnails?.high?.url || "",
-        title: item.snippet?.title || "No title",
-        description: item.snippet?.description || "No description available",
-        channelTitle: item.snippet?.channelTitle || "Unknown Channel",
-        channelThumbnail:
-          item.snippet?.thumbnails?.high?.url ||
-          item.snippet?.thumbnails?.medium?.url ||
-          item.snippet?.thumbnails?.default?.url,
-        publishDate: timeAgo(item.snippet?.publishedAt || ""),
-        publishAt: item.snippet?.publishedAt || "",
-        viewCount: formatNumber(item.statistics?.viewCount ?? "0"),
-        duration: item.contentDetails?.duration
-          ? parseDuration(item.contentDetails.duration)
-          : "0:00",
-        channelId,
-      };
-    });
+    const videos = detailsResponse.data.items.map((item) => ({
+      videoId: item.id,
+      thumbnailUrl: item.snippet?.thumbnails?.high?.url || "",
+      title: item.snippet?.title || "No title",
+      description: item.snippet?.description || "No description",
+      channelTitle: item.snippet?.channelTitle || "Unknown Channel",
+      channelThumbnail:
+        item.snippet?.thumbnails?.high?.url ||
+        item.snippet?.thumbnails?.medium?.url ||
+        item.snippet?.thumbnails?.default?.url,
+      publishDate: timeAgo(item.snippet?.publishedAt || ""),
+      publishAt: item.snippet?.publishedAt || "",
+      viewCount: formatNumber(item.statistics?.viewCount ?? "0"),
+      duration: item.contentDetails?.duration
+        ? parseDuration(item.contentDetails.duration)
+        : "0:00",
+      channelId: item.snippet.channelId,
+    }));
 
     return res.status(200).json({
       success: true,
-      emotion,
+      bestEmotion: emotion,
       videos,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    throw new ApiError(
-      error.response?.status || 500,
-      error.message || "Error fetching videos"
-    );
+    throw new ApiError(error.status || 500, error.message || "Error fetching videos");
   }
 });
 

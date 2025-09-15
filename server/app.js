@@ -13,11 +13,15 @@ import subscribeRoute from './routes/subscribe.route.js';
 import emotionRoute from './routes/emotion.route.js'
 import cors from 'cors';
 const app = express();
+import bodyParser from "body-parser";
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static("public"));
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+
 
 app.use(cors({ 
     origin: process.env.FRONTEND_URL ,

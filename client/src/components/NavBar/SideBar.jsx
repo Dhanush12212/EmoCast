@@ -16,7 +16,7 @@ export const sidebarItems = [
 
 function SideBar() {
   return ( 
-    <div className="flex flex-col items-center py-2 w-25 bg-[#181818] text-white min-h-screen relative top-18">
+    <div className="flex flex-col items-center py-2 w-25 bg-[#121212] text-white min-h-screen relative top-18">
       
       {/* Menu Items */}
       {sidebarItems.map((item, idx) => (
@@ -33,11 +33,7 @@ function SideBar() {
       {/* WebCam pinned at bottom */}
       <div className="w-full">
         <div className="flex flex-col items-center justify-center py-3 hover:bg-[#3D3D3D] rounded-xl transition-all duration-200 cursor-pointer">
-          <WebCamCapture 
-            onEmotion={(data) => {
-              console.log("Detected emotion:", data.emotion);
-            }}
-          /> 
+          <WebCamCapture  /> 
         </div>
       </div>
     </div>
