@@ -291,6 +291,7 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
         regionCode: 'IN',
         maxResults: 50,
         videoCategoryId: categoryId,
+        videoDuration: "medium",
         key: YOUTUBE_API_KEY,
       },
     });

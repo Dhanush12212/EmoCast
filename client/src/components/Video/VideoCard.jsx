@@ -15,7 +15,7 @@ function VideoCard({ selectedCategory, category }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { query } = useParams();
-  const { emotion } = useEmotion(); // ✅ Emotion context (best emotion from webcam)
+  const { emotion } = useEmotion();   
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -26,9 +26,10 @@ function VideoCard({ selectedCategory, category }) {
         if (emotion && typeof emotion === "string" && emotion !== "unknown" && emotion !== "none") {
           console.log("Fetching videos for emotion:", emotion);
           const response = await axios.get(
-            `${API_URL}/emotion/fetchVideosByEmotion`,
-            { params: { emotion }, withCredentials: true }
+            `${API_URL}/emotion/fetchEmotionVideos`,
+            { params: { emotion: 'happy' }, withCredentials: true }
           );
+          
           setVideos(response.data.videos || []);
           setLoading(false);
           return;

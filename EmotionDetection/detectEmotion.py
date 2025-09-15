@@ -16,7 +16,7 @@ try:
     sys.stderr.write("✅ Model loaded successfully\n")
     sys.stderr.flush()
 except Exception as e:
-    sys.stderr.write(f"❌ Failed to load model: {e}\n")
+    sys.stderr.write(f"Failed to load model: {e}\n")
     sys.stderr.flush()
     sys.exit(1)
 
@@ -33,7 +33,7 @@ def base64_to_image(img_base64):
         np_arr = np.frombuffer(img_data, np.uint8)
         return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     except Exception as e:
-        sys.stderr.write(f"❌ Error decoding image: {e}\n")
+        sys.stderr.write(f" Error decoding image: {e}\n")
         sys.stderr.flush()
         return None
 
@@ -43,13 +43,13 @@ def preprocess_frame(img):
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
 
     if len(faces) == 0:
-        return None  # 🚨 no face detected
-
+        return None 
+    
     (x, y, w, h) = faces[0]
     roi_gray = gray[y:y+h, x:x+w]
     roi_resized = cv2.resize(roi_gray, (48, 48))
     roi_normalized = roi_resized.astype("float32") / 255.0
-    roi_reshaped = np.expand_dims(roi_normalized, axis=(0, -1))  # shape (1,48,48,1)
+    roi_reshaped = np.expand_dims(roi_normalized, axis=(0, -1))
     return roi_reshaped
 
 def detect_single_frame(img_base64):
@@ -59,14 +59,14 @@ def detect_single_frame(img_base64):
         return {"emotion": "unknown", "confidence": 0.0}
 
     processed = preprocess_frame(img)
-    if processed is None:  # 🚨 no face detected
+    if processed is None:   
         return {"emotion": "unknown", "confidence": 0.0}
 
     preds = model.predict(processed, verbose=0)[0]
     best_idx = int(np.argmax(preds))
     confidence = float(preds[best_idx])
 
-    if confidence < 0.2:  # 👈 threshold check
+    if confidence < 0.2:   
         return {"emotion": "unknown", "confidence": round(confidence, 3)}
 
     return {

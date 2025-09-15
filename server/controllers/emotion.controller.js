@@ -115,8 +115,7 @@ function detectEmotion(images) {
  
 const detectEmotionRoute = asyncHandler(async (req, res) => {
   let { image, images } = req.body;
-
-  // Normalize: wrap single frame into array
+ 
   if (image && !images) images = [image];
   if (!images || !Array.isArray(images) || images.length === 0) {
     return res.status(400).json({ error: "No image(s) provided" });
@@ -156,9 +155,9 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
   const { emotion } = req.query;
 
   console.log("Final Best Emotion:", emotion);
-
+ 
   if (!emotion || emotion.toLowerCase() === "unknown" || emotion.toLowerCase() === "none") {
-    return res.status(400).json({ error: "No valid best emotion provided" });
+    return res.status(404).json({ error: "No valid best emotion detected" });
   }
 
   try {
@@ -166,8 +165,9 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       params: {
         part: "snippet",
         regionCode: "IN",
-        q: `${emotion} relaxing videos`,
+        q: `${emotion} chill vibes OR relaxing music OR feel-good videos`,
         type: "video",
+        videoDuration: "medium",
         maxResults: 30,
         key: YOUTUBE_API_KEY,
       },

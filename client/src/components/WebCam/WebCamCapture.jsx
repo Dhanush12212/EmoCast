@@ -3,6 +3,7 @@ import { LuScanFace } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../../config";
+import { useEmotion } from "../Contexts/EmotionContext";
 
 function WebCamCapture({ onEmotion }) {
   const [syncActive, setSyncActive] = useState(false);
@@ -10,10 +11,11 @@ function WebCamCapture({ onEmotion }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const navigate = useNavigate();
+  const { setEmotion } = useEmotion();
 
   const isLoggedIn = Boolean(localStorage.getItem("user"));
 
-  // Setup webcam stream when sync is active
+  // Setup webcam stream
   useEffect(() => {
     if (!syncActive) return;
 
@@ -23,31 +25,21 @@ function WebCamCapture({ onEmotion }) {
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current
-              .play()
-              .catch((err) => console.error("Video play error:", err));
-          };
+          videoRef.current.onloadedmetadata = () => videoRef.current.play().catch(console.error);
         }
       } catch (err) {
         console.error("Error accessing webcam:", err);
       }
     })();
 
-    return () => {
-      stopCamera();
-    };
+    return () => stopCamera();
   }, [syncActive]);
 
   // Ensure video is ready before capturing
-  const waitForVideo = () => {
-    return new Promise((resolve) => {
+  const waitForVideo = () =>
+    new Promise((resolve) => {
       const check = () => {
-        if (
-          videoRef.current &&
-          videoRef.current.videoWidth > 0 &&
-          videoRef.current.videoHeight > 0
-        ) {
+        if (videoRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
           resolve();
         } else {
           requestAnimationFrame(check);
@@ -55,14 +47,11 @@ function WebCamCapture({ onEmotion }) {
       };
       check();
     });
-  };
- 
+
+  // Capture a single frame from video
   const captureFrame = () => {
     const video = videoRef.current;
-    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
-      console.warn("Video not ready or closed.");
-      return null;
-    }
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) return null;
 
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -71,16 +60,12 @@ function WebCamCapture({ onEmotion }) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.5);
-    console.log(
-      `Captured frame (${canvas.width}x${canvas.height}) length: ${dataUrl.length}`
-    );
-    return dataUrl;
+    return canvas.toDataURL("image/jpeg", 0.5);
   };
 
+  // Capture 3 frames
   const captureThreeFrames = async () => {
     const frames = [];
-
     for (let i = 0; i < 3; i++) {
       const frame = captureFrame();
       if (frame) frames.push(frame);
@@ -92,7 +77,9 @@ function WebCamCapture({ onEmotion }) {
     setIsCapturing(false);
 
     if (frames.length === 0) {
-      if (onEmotion) onEmotion({ emotion: "unknown", confidence: 0.0 });
+      const unknown = "unknown";
+      onEmotion?.({ emotion: unknown, confidence: 0 });
+      setEmotion(unknown);
       return;
     }
 
@@ -100,27 +87,25 @@ function WebCamCapture({ onEmotion }) {
       const response = await axios.post(
         `${API_URL}/emotion/detectEmotion`,
         { images: frames },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-      console.log("Server response:", response.data.emotion);
 
-      if (onEmotion) {
-        onEmotion(
-          response.data?.emotion
-            ? response.data.emotion
-            : { emotion: "unknown", confidence: 0.0 }
-        );
-      }
+      const detected = response.data?.emotion || { emotion: "unknown", confidence: 0 };
+      const emotionStr = detected.emotion || "unknown";
+
+      // Update context and callback
+      setEmotion(emotionStr);
+      onEmotion?.({ emotion: emotionStr, confidence: detected.confidence });
+
+      console.log("Detected emotion:", detected);
     } catch (err) {
-      console.error(" Error sending frames:", err);
-      if (onEmotion) onEmotion({ emotion: "error", confidence: 0.0 });
+      console.error("Error sending frames:", err);
+      const errorEmotion = "error";
+      setEmotion(errorEmotion);
+      onEmotion?.({ emotion: errorEmotion, confidence: 0 });
     }
   };
 
-  // Handle click
   const handleCaptureClick = async () => {
     if (!isLoggedIn) {
       navigate("/login");
@@ -132,60 +117,36 @@ function WebCamCapture({ onEmotion }) {
     setSyncActive(true);
     setIsCapturing(true);
     await waitForVideo();
-    captureThreeFrames();  
+    captureThreeFrames();
   };
 
-  // Stop webcam completely
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    if (videoRef.current) videoRef.current.srcObject = null;
   };
 
   return (
     <div className="flex flex-col items-center">
       {/* Sync Button */}
       <div
-        className={`flex flex-col items-center justify-center px-4 py-2 cursor-pointer transition-all duration-300  w-24
-          ${
-            syncActive
-              ? "bg-green-600 rounded-2xl shadow-lg transform scale-105 animate-pulse"
-              : "bg-transparent rounded-2xl"
-          } ${isCapturing ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`flex flex-col items-center justify-center px-4 py-2 cursor-pointer transition-all duration-300 w-24
+          ${syncActive ? "bg-green-600 rounded-2xl shadow-lg transform scale-105 animate-pulse" : "bg-transparent rounded-2xl"}
+          ${isCapturing ? "opacity-50 cursor-not-allowed" : ""}`}
         onClick={handleCaptureClick}
         title={syncActive ? "Capturing..." : "Start Sync"}
       >
-        <LuScanFace
-          className={`w-6 h-6 mb-1 ${
-            syncActive ? "text-white" : "text-gray-200"
-          }`}
-        />
-        <span
-          className={`text-md font-medium ${
-            syncActive ? "text-white" : "text-gray-200"
-          }`}
-        >
+        <LuScanFace className={`w-6 h-6 mb-1 ${syncActive ? "text-white" : "text-gray-200"}`} />
+        <span className={`text-md font-medium ${syncActive ? "text-white" : "text-gray-200"}`}>
           {syncActive ? "Capturing..." : "Sync"}
         </span>
       </div>
 
-      {/* Video container */}
-      <div
-        className={`mt-3 ${
-          syncActive ? "flex" : "hidden"
-        } items-center justify-center`}
-      >
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className="border border-green-500 w-24 rounded-lg"
-        />
+      {/* Video preview */}
+      <div className={`mt-3 ${syncActive ? "flex" : "hidden"} items-center justify-center`}>
+        <video ref={videoRef} autoPlay muted playsInline className="border border-green-500 w-24 rounded-lg" />
       </div>
     </div>
   );
