@@ -16,57 +16,43 @@ const SEARCH_API_URL = process.env.SEARCH_API_URL;
 const COMMENTS_API_URL = process.env.COMMENTS_API_URL;
 const CATEGORIES_API_URL = process.env.CATEGORIES_API_URL;
 
-//Fetching Videos for the Home Page
 const fetchVideos = asyncHandler(async (req, res) => {
-    try { 
-        const response = await axios.get(YOUTUBE_API_URL, {
-            params: {
-                part: 'snippet,statistics,contentDetails',
-                chart: 'mostPopular',
-                regionCode: 'IN',
-                maxResults: 30,
-                key: YOUTUBE_API_KEY,
-            },
-        });
+  try {
+    const { pageToken } = req.query;
 
-        if (!response || !response.data.items.length)
-            throw new ApiError(404, "No Videos found");
+    const response = await axios.get(YOUTUBE_API_URL, {
+      params: {
+        part: 'snippet,statistics,contentDetails',
+        chart: 'mostPopular',
+        regionCode: 'IN',
+        maxResults: 32,
+        key: YOUTUBE_API_KEY,
+        pageToken: pageToken || "",
+      },
+    });
 
-        // Extract video IDs from the response
-        const videoIds = response.data.items
-            .map(item => item.id)  
-            .filter(id => id); 
+    if (!response.data.items.length)
+      throw new ApiError(404, "No Videos found");
 
-        if (videoIds.length === 0) {
-            throw new ApiError(404, "No valid video IDs found");
-        }
+    const videos = response.data.items.map(item => ({
+      videoId: item.id || '',
+      thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
+      title: item.snippet?.title || "No title",
+      channelTitle: item.snippet?.channelTitle || "Unknown Channel",
+      channelThumbnail: item.snippet?.thumbnails?.high?.url || '',
+      publishDate: timeAgo(item.snippet?.publishedAt || ''),
+      viewCount: formatNumber(item.statistics?.viewCount ?? '0'),
+      duration: item.contentDetails?.duration ? parseDuration(item.contentDetails.duration) : '0:00',
+      channelId: item.snippet.channelId,
+    }));
 
-        
-        const videos = response.data.items.map(item => {  
-          const channelId = item.snippet.channelId; 
-          
-            return {
-                videoId: item.id || '',
-                thumbnailUrl: item.snippet?.thumbnails?.high?.url || '',
-                title: item.snippet?.title || "No title",
-                description: item.snippet?.description || "No description available",
-                channelTitle: item.snippet?.channelTitle || "Unknown Channel",
-                channelThumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
-                publishDate: timeAgo(item.snippet?.publishedAt || ''),
-                publishAt: item.snippet?.publishedAt || '',
-                viewCount: formatNumber(item.statistics?.viewCount ?? '0'),   
-                duration: item.contentDetails?.duration
-                      ? parseDuration(item.contentDetails.duration)
-                      : '0:00',    
-                channelId,
-              };
-            });  
-        
-        //Sending the video response to the frontend 
-        return res.status(200).json({ videos });
-    } catch (error) { 
-        throw new ApiError(error.response?.status || 500, error.message || "Error fetching videos");
-    }
+    res.status(200).json({
+      videos,
+      nextPageToken: response.data.nextPageToken || null,
+    });
+  } catch (error) {
+    throw new ApiError(error.response?.status || 500, error.message || "Error fetching videos");
+  }
 }); 
 
 
@@ -176,31 +162,32 @@ const fetchSingleVideo = asyncHandler(async (req, res) => {
     }
 });
 
-//Controller for Search Videos
+// Search Videos with pagination
 const searchVideos = asyncHandler(async (req, res) => {
-  const { q } = req.query;
+  const { q, pageToken } = req.query;
   if (!q) {
     throw new ApiError(400, 'Search query is required');
   }
 
-  try { 
+  try {
     const searchResponse = await axios.get(SEARCH_API_URL, {
       params: {
         part: 'snippet',
-        maxResults: 100,
+        maxResults: 30,
         q,
         type: 'video',
+        pageToken: pageToken || '',
         key: YOUTUBE_API_KEY,
       },
     });
 
-    const searchItems = searchResponse.data.items;
+    const searchItems = searchResponse.data.items || [];
     const videoIds = searchItems.map(item => item.id.videoId).filter(Boolean);
 
     if (videoIds.length === 0) {
-      return res.status(200).json({ videos: [] });
+      return res.status(200).json({ videos: [], nextPageToken: searchResponse.data.nextPageToken || null });
     }
- 
+
     const statsResponse = await axios.get(YOUTUBE_API_URL, {
       params: {
         part: 'statistics,contentDetails',
@@ -227,7 +214,7 @@ const searchVideos = asyncHandler(async (req, res) => {
         videoId,
         thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
         title: item.snippet?.title || 'No Title',
-        channelId: item.snippet.channelId,      
+        channelId: item.snippet.channelId,
         channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
         channelThumbnail:
           item.snippet?.thumbnails?.high?.url ||
@@ -235,18 +222,19 @@ const searchVideos = asyncHandler(async (req, res) => {
           item.snippet?.thumbnails?.default?.url,
         publishDate: timeAgo(item.snippet?.publishedAt || ''),
         viewCount: formatNumber(stats.viewCount || '0'),
-        duration: contentDetails.duration
-          ? parseDuration(contentDetails.duration)
-          : '0:00',
+        duration: contentDetails.duration ? parseDuration(contentDetails.duration) : '0:00',
       };
     });
 
-    res.status(200).json({ videos: formattedDetails });
+    res.status(200).json({
+      videos: formattedDetails,
+      nextPageToken: searchResponse.data.nextPageToken || null,
+    });
   } catch (error) {
     console.log('Error Searching Videos', error.message);
-    throw new ApiError(500, 'Failed to Fetch the videos from Youtube API');
+    throw new ApiError(500, 'Failed to fetch videos from YouTube API');
   }
-}); 
+});
 
 //Fetching the Video Category array from the youtube endpoint
 const videoCategories  = asyncHandler(async(req, res) => {
@@ -275,9 +263,10 @@ const videoCategories  = asyncHandler(async(req, res) => {
     }
 });
 
-//Fetch Category Videos
+// Get videos by category with pagination
 const getVideosByCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
+  const { pageToken } = req.query;
 
   if (!categoryId) {
     throw new ApiError(400, "Category ID is required");
@@ -289,40 +278,40 @@ const getVideosByCategory = asyncHandler(async (req, res) => {
         part: 'snippet,statistics,contentDetails',
         chart: 'mostPopular',
         regionCode: 'IN',
-        maxResults: 50,
+        maxResults: 30,
         videoCategoryId: categoryId,
         videoDuration: "medium",
+        pageToken: pageToken || '',
         key: YOUTUBE_API_KEY,
       },
     });
 
     const videos = response.data.items || [];
 
-    if (videos.length === 0) { 
+    if (videos.length === 0) {
       throw new ApiError(400, "No videos found for this category");
     }
 
-    const formattedVideos = videos
-    .map((item) => ({
+    const formattedVideos = videos.map(item => ({
       videoId: item.id,
       thumbnailUrl: item.snippet?.thumbnails?.medium?.url || '',
       title: item.snippet?.title || 'No Title',
       channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
       channelThumbnail: item.snippet?.thumbnails?.default?.url || '',
       publishDate: timeAgo(item.snippet?.publishedAt || ''),
-      viewCount: formatNumber(item.statistics?.viewCount || '0'), 
-      duration: item.contentDetails?.duration
-        ? parseDuration(item.contentDetails.duration)
-        : '0:00'
+      viewCount: formatNumber(item.statistics?.viewCount || '0'),
+      duration: item.contentDetails?.duration ? parseDuration(item.contentDetails.duration) : '0:00',
     }));
 
-    return res.status(200).json({ videos: formattedVideos });
-
-  } catch (error) { 
+    res.status(200).json({
+      videos: formattedVideos,
+      nextPageToken: response.data.nextPageToken || null,
+    });
+  } catch (error) {
     if (error instanceof ApiError) {
       return res.status(error.statusCode).json({ message: error.message });
     }
- 
+
     if (error.response?.status === 404) {
       return res.status(400).json({ message: "No videos found (404 from YouTube)" });
     }

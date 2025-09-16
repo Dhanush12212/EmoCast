@@ -151,14 +151,14 @@ const detectEmotionRoute = asyncHandler(async (req, res) => {
 });
 
 const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
-  const { emotion } = req.query;
+  const { emotion, pageToken } = req.query;
 
   if (!emotion || emotion.toLowerCase() === "unknown" || emotion.toLowerCase() === "none") {
     console.error("No face detected (emotion unknown/none)");
     return res.status(404).json({ success: false, error: "No Face Detected" });
   }
 
-  const emotionKey = (emotion || "").toLowerCase();
+  const emotionKey = emotion.toLowerCase();
 
   const emotionQueries = {
     happy: "happy songs OR feel-good videos OR fun vlogs OR comedy",
@@ -173,6 +173,7 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
   const query = emotionQueries[emotionKey] || emotionKey;
 
   try {
+    // Step 1: Search videos
     const searchResponse = await axios.get(SEARCH_API_URL, {
       params: {
         part: "snippet",
@@ -181,6 +182,7 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
         type: "video",
         videoDuration: "medium",
         maxResults: 30,
+        pageToken: pageToken || "", // <-- support pagination
         key: YOUTUBE_API_KEY,
       },
     });
@@ -197,6 +199,7 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       return res.status(404).json({ success: false, error: "No valid video IDs" });
     }
 
+    // Step 2: Fetch video details
     const detailsResponse = await axios.get(YOUTUBE_API_URL, {
       params: {
         part: "snippet,contentDetails,statistics",
@@ -228,6 +231,7 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       success: true,
       bestEmotion: emotion,
       videos,
+      nextPageToken: searchResponse.data.nextPageToken || null, // <-- return nextPageToken
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
@@ -241,5 +245,6 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
     });
   }
 });
+
 
 export { detectEmotionRoute, fetchVideosByEmotionRoute };
