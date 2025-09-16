@@ -4,12 +4,14 @@ import {Link} from 'react-router-dom'
 import axios from 'axios';
 import { API_URL } from '../../../config';
 import { useNavigate } from 'react-router-dom';
+import WebCamCapture from '../WebCam/WebCamCapture';
  
 function SideFullBar() {
 
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const isLoggedIn = Boolean(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchChannels = async() => {
@@ -45,13 +47,22 @@ function SideFullBar() {
               </Link>
             );
         })}
+        <div className='mt-2'>
+          <WebCamCapture/>
+        </div>
         <p className='m-5 text-xl'>Subscriptions</p>
 
         {/* SubScriptions */}
         {loading ? (
           <p className='text-gray-400 text-sm mt-2'>Loading subscriptions...</p>
           ) : channels.length === 0 ? (
-              <p className='text-gray-500 text-sm mt-2'>No subscriptions found</p>
+          <p
+            className={`m-4 px-4 py-2 rounded-lg text-sm font-medium w-fit
+              ${isLoggedIn ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" 
+                           : "bg-red-500/10 text-red-400 border border-red-500/20"}`}
+          >
+            {isLoggedIn ? "📭 No Channel Subscribed" : "Login is required"}
+          </p>
             ) : (
           channels.map((channel) => (
             <div 

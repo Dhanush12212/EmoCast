@@ -25,7 +25,7 @@ function ProfileFeed() {
     }
   };
 
-  // 🚀 Google Login Handler
+  // Google Login Handler
   const handleGoogleLogin = () => {
     navigate('/login');
   };

@@ -4,7 +4,9 @@ import axios from 'axios';
 import { API_URL } from '../../../config';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
-import LoaderOrError from '../Reausables/LoaderOrError';
+import LoaderOrError from '../Reausables/LoaderOrError'; 
+import Swal from "sweetalert2";
+
 
 function SubscribedVideos() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +15,7 @@ function SubscribedVideos() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate(); 
+  const isLoggedIn = Boolean(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -25,6 +28,17 @@ function SubscribedVideos() {
         }); 
         setVideos(response.data.videos || []);
       } catch (error) {
+          Swal.fire({
+          icon: "info",
+          title: "🔒 Login Required",
+          text: "You need to log in before syncing your emotions.",
+          confirmButtonText: "Okay",
+          confirmButtonColor: "#e50914", 
+          background: "#1e1e1e",  
+          color: "#fff",
+        });
+        navigate("/");
+        return;
         setError(error.response?.data?.message || 'Failed to fetch videos!!');
       } finally {
         setLoading(false);

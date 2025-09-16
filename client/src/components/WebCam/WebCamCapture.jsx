@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../../config";
 import { useEmotion } from "../Contexts/EmotionContext";
+import Swal from "sweetalert2";
 
 function WebCamCapture({ onEmotion }) {
   const [syncActive, setSyncActive] = useState(false);
@@ -108,7 +109,15 @@ function WebCamCapture({ onEmotion }) {
 
   const handleCaptureClick = async () => {
     if (!isLoggedIn) {
-      navigate("/login");
+      Swal.fire({
+        icon: "info",
+        title: "🔒 Login Required",
+        text: "You need to log in before syncing your emotions.",
+        confirmButtonText: "Okay",
+        confirmButtonColor: "#e50914", // YouTube red
+        background: "#1e1e1e", // Dark theme
+        color: "#fff",
+      });
       return;
     }
 

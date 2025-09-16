@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VideoMenu from './VideoMenu';
 import LoaderOrError from '../Reausables/LoaderOrError';
 import { useEmotion } from '../Contexts/EmotionContext';
+import Swal from "sweetalert2";
 
 function VideoCard({ selectedCategory, category }) {
   const [loading, setLoading] = useState(false);
@@ -17,48 +18,65 @@ function VideoCard({ selectedCategory, category }) {
   const { query } = useParams();
   const { emotion } = useEmotion();   
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true);
-      setError(null);
+useEffect(() => {
+  const fetchVideos = async () => {
+    setLoading(true);
+    setError(null);
 
-      try { 
-        if (emotion && typeof emotion === "string" && emotion !== "unknown" && emotion !== "none") {
-          console.log("Fetching videos for emotion:", emotion);
-          const response = await axios.get(
-            `${API_URL}/emotion/fetchEmotionVideos`,
-            { params: { emotion: 'happy' }, withCredentials: true }
-          );
-          
-          setVideos(response.data.videos || []);
-          setLoading(false);
-          return;
-        }
- 
-        let url = `${API_URL}/allVideos/videos`;
-        let params = {};
-
-        if (query) {
-          url = `${API_URL}/searchVideos/search`;
-          params = { q: query };
-        } else if (selectedCategory) {
-          url = `${API_URL}/allVideos/byCategory/${selectedCategory}`;
-        } else if (category) {
-          url = `${API_URL}/searchVideos/search`;
-          params = { q: category };
-        }
-
-        const response = await axios.get(url, { params, withCredentials: true });
+    try { 
+      if (emotion && typeof emotion === "string" && emotion !== "none") {
+        console.log("Fetching videos for emotion:", emotion);
+        const response = await axios.get(
+          `${API_URL}/emotion/fetchEmotionVideos`,
+          { params: { emotion: emotion }, withCredentials: true }
+        ); 
+        
         setVideos(response.data.videos || []);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch videos!');
-      } finally {
         setLoading(false);
+        return;
       }
-    };
 
-    fetchVideos();
-  }, [query, selectedCategory, category, emotion]);  
+      let url = `${API_URL}/allVideos/videos`;
+      let params = {};
+
+      if (query) {
+        url = `${API_URL}/searchVideos/search`;
+        params = { q: query };
+      } else if (selectedCategory) {
+        url = `${API_URL}/allVideos/byCategory/${selectedCategory}`;
+      } else if (category) {
+        url = `${API_URL}/searchVideos/search`;
+        params = { q: category };
+      }
+
+      const response = await axios.get(url, { params, withCredentials: true });
+      setVideos(response.data.videos || []);
+    } catch (err) {
+  if (err.response?.status === 404) {
+
+    Swal.fire({
+        icon: "warning",
+        title: "No Face Detected",
+        text: "Please make sure your face is visible to the camera.",
+        confirmButtonText: "Try Again",
+        confirmButtonColor: "#e50914", 
+        background: "#1e1e1e", 
+        color: "#fff"
+      });
+      return;
+    }
+      const message = err.response?.data?.error || 'Failed to fetch videos!';
+      setError(message);
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchVideos();
+}, [query, selectedCategory, category, emotion]);
+
+
   const handleMenuToggle = (id) => {
     setOpenMenuId(openMenuId === id ? null : id);
   };

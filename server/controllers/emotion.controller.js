@@ -63,11 +63,11 @@ function attachPythonListeners() {
   });
 
   py.stderr.on("data", (data) => {
-    console.error("🐍 Python stderr:", data.toString().trim());
+    console.error("Python stderr:", data.toString().trim());
   });
 
   py.on("exit", (code, signal) => {
-    console.error(`🐍 Python exited (code: ${code}, signal: ${signal})`);
+    console.error(`Python exited (code: ${code}, signal: ${signal})`);
     for (const [id, { reject }] of pending) {
       reject(new ApiError(500, "Python process crashed"));
     }
@@ -102,7 +102,7 @@ function detectEmotion(images) {
       pending.delete(id);
       reject(new ApiError(500, "Python communication error"));
     }
- 
+
     setTimeout(() => {
       if (pending.has(id)) {
         pending.get(id).reject(new ApiError(504, "Python response timeout"));
@@ -112,12 +112,12 @@ function detectEmotion(images) {
   });
 }
 
- 
 const detectEmotionRoute = asyncHandler(async (req, res) => {
   let { image, images } = req.body;
- 
+
   if (image && !images) images = [image];
   if (!images || !Array.isArray(images) || images.length === 0) {
+    console.error("No image(s) provided to detectEmotionRoute");
     return res.status(400).json({ error: "No image(s) provided" });
   }
 
@@ -150,22 +150,34 @@ const detectEmotionRoute = asyncHandler(async (req, res) => {
   }
 });
 
-
 const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
   const { emotion } = req.query;
 
-  console.log("Final Best Emotion:", emotion);
- 
   if (!emotion || emotion.toLowerCase() === "unknown" || emotion.toLowerCase() === "none") {
-    return res.status(404).json({ error: "No valid best emotion detected" });
+    console.error("No face detected (emotion unknown/none)");
+    return res.status(404).json({ success: false, error: "No Face Detected" });
   }
+
+  const emotionKey = (emotion || "").toLowerCase();
+
+  const emotionQueries = {
+    happy: "happy songs OR feel-good videos OR fun vlogs OR comedy",
+    sad: "sad songs OR emotional music OR comforting videos OR motivational talks",
+    angry: "calming music OR anger management tips OR relaxing nature sounds",
+    surprise: "surprising facts OR amazing videos OR shocking moments OR wow content",
+    disgust: "funny videos OR wholesome content OR uplifting videos",
+    fear: "motivational talks OR confidence boosting OR relaxation music",
+    neutral: "popular trending videos OR chill content OR relaxing playlists",
+  };
+
+  const query = emotionQueries[emotionKey] || emotionKey;
 
   try {
     const searchResponse = await axios.get(SEARCH_API_URL, {
       params: {
         part: "snippet",
         regionCode: "IN",
-        q: `${emotion} chill vibes OR relaxing music OR feel-good videos`,
+        q: query,
         type: "video",
         videoDuration: "medium",
         maxResults: 30,
@@ -174,10 +186,16 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
     });
 
     const items = searchResponse?.data?.items || [];
-    if (items.length === 0) throw new ApiError(404, `No videos for ${emotion}`);
+    if (items.length === 0) {
+      console.error(`No videos found for emotion: ${emotion}`);
+      return res.status(404).json({ success: false, error: `No videos for ${emotion}` });
+    }
 
     const videoIds = items.map((item) => item.id.videoId).filter(Boolean);
-    if (videoIds.length === 0) throw new ApiError(404, "No valid video IDs");
+    if (videoIds.length === 0) {
+      console.error("No valid video IDs returned from YouTube API");
+      return res.status(404).json({ success: false, error: "No valid video IDs" });
+    }
 
     const detailsResponse = await axios.get(YOUTUBE_API_URL, {
       params: {
@@ -213,7 +231,14 @@ const fetchVideosByEmotionRoute = asyncHandler(async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    throw new ApiError(error.status || 500, error.message || "Error fetching videos");
+    console.error("Error in fetchVideosByEmotionRoute:", error.message);
+    const status = error.response?.status || error.status || 500;
+    const message = error.response?.data?.error || error.message || "Error fetching videos";
+
+    return res.status(status).json({
+      success: false,
+      error: message,
+    });
   }
 });
 

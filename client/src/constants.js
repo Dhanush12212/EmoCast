@@ -1,14 +1,14 @@
 import { GoHomeFill } from "react-icons/go";
 import { SiYoutubeshorts } from "react-icons/si";
 import { MdOutlineSubscriptions, MdOutlineWatchLater, MdOutlinePlaylistPlay} from "react-icons/md"; 
-import { CgProfile } from "react-icons/cg";  
+import { CgProfile } from "react-icons/cg";   
 
 export const sidebarItems = [
   { icon: GoHomeFill, label: "Home", path: '/'},
   { icon: SiYoutubeshorts, label: "Shorts", path: '/shorts' },
   { icon: MdOutlineSubscriptions, label: "Subscription", path: '/subscription' },  
   { icon: MdOutlineWatchLater, label: "Watch Later", path: '/watchLater' }, 
-  { icon: CgProfile, label: "You", path:'/profile' },   
+  { icon: CgProfile, label: "You", path:'/profile' },    
   {divider: true},
 ];
 

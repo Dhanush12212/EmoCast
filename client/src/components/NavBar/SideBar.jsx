@@ -32,7 +32,7 @@ function SideBar() {
 
       {/* WebCam pinned at bottom */}
       <div className="w-full">
-        <div className="flex flex-col items-center justify-center py-3 hover:bg-[#3D3D3D] rounded-xl transition-all duration-200 cursor-pointer">
+        <div className="flex flex-col items-center justify-center py-2 hover:bg-[#3D3D3D] rounded-xl transition-all duration-200 cursor-pointer">
           <WebCamCapture  /> 
         </div>
       </div>

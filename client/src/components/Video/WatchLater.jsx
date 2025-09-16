@@ -1,23 +1,42 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../../../config';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../../../config";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { CiBookmarkRemove } from "react-icons/ci";
-import LoaderOrError from '../Reausables/LoaderOrError';
-import { assets } from '../../assets/assets';
-import NavBar from '../NavBar/NavBar';
-import SideBar from '../NavBar/SideBar';
+import LoaderOrError from "../Reausables/LoaderOrError";
+import { assets } from "../../assets/assets";
+import NavBar from "../NavBar/NavBar";
+import SideBar from "../NavBar/SideBar";
+import Swal from "sweetalert2";
 
 function WatchLater() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [videos, setVideos] = useState([]);
+  const [authorized, setAuthorized] = useState(true); // track login status
   const navigate = useNavigate();
   const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null);
+  const menuRef = useRef(null); 
 
   useEffect(() => {
+    const isLoggedIn = Boolean(localStorage.getItem("user"));
+
+    if (!isLoggedIn) {
+      setAuthorized(false);
+      Swal.fire({
+        icon: "info",
+        title: "🔒 Login Required",
+        text: "You need to log in to access your Watch Later videos.",
+        confirmButtonText: "Okay",
+        confirmButtonColor: "#e50914",
+        background: "#1e1e1e",
+        color: "#fff",
+      });
+      navigate('/');
+      return;
+    }
+
     const fetchVideos = async () => {
       setLoading(true);
       setError(null);
@@ -27,16 +46,28 @@ function WatchLater() {
         });
 
         const cleanedVideos = Array.isArray(response.data)
-          ? response.data.filter(video => video && video.videoId)
+          ? response.data.filter((video) => video && video.videoId)
           : [];
 
         setVideos(cleanedVideos);
       } catch (error) {
         if (error?.response?.status === 401) {
-          navigate('/login');
+          setAuthorized(false);
+          Swal.fire({
+            icon: "info",
+            title: "🔒 Login Required",
+            text: "You need to log in to access your Watch Later videos.",
+            confirmButtonText: "Okay",
+            confirmButtonColor: "#e50914",
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+          return;
         } else {
           console.error("ERROR:", error);
-          setError(error.response?.data?.message || "Failed to fetch videos!!");
+          setError(
+            error.response?.data?.message || "Failed to fetch videos!!"
+          );
         }
       } finally {
         setLoading(false);
@@ -46,14 +77,14 @@ function WatchLater() {
     fetchVideos();
   }, [navigate]);
 
-  const handleDelete = async (videoId) => { 
+  const handleDelete = async (videoId) => {
     try {
       await axios.delete(`${API_URL}/watchLater/delete/${videoId}`, {
         withCredentials: true,
       });
-      setVideos(prev => prev.filter(video => video.videoId !== videoId));
+      setVideos((prev) => prev.filter((video) => video.videoId !== videoId));
     } catch (err) {
-      console.error('Error deleting video:', err);
+      console.error("Error deleting video:", err);
     }
   };
 
@@ -68,9 +99,13 @@ function WatchLater() {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
+ 
+  if (!authorized) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col h-screen">
@@ -88,13 +123,17 @@ function WatchLater() {
         {/* Main Content */}
         <div className="flex-1 ml-30 overflow-x-hidden ">
           <div className="w-full min-h-screen bg-[#0f0f0f] text-white px-10 py-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">📺 Watch Later</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">
+              📺 Watch Later
+            </h1>
             <LoaderOrError loading={loading} error={error} />
             {!loading && !error && (
               videos.length === 0 ? (
                 <div className="text-center text-gray-400 mt-16 text-xl">
                   <p>No videos added to your Watch Later list.</p>
-                  <p className="text-sm mt-2">Start exploring and save videos you want to watch later!</p>
+                  <p className="text-sm mt-2">
+                    Start exploring and save videos you want to watch later!
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -123,15 +162,27 @@ function WatchLater() {
                             src={video.channelThumbnail || assets.Subscription}
                             alt="Channel"
                             className="h-10 w-10 rounded-full object-cover border"
-                            onClick={() => navigate(`/channel/${video.channelId}`)}
+                            onClick={() =>
+                              navigate(`/channel/${video.channelId}`)
+                            }
                           />
                           <div className="flex flex-col">
-                            <h2 className="text-lg font-medium text-white line-clamp-2">{video.title}</h2>
-                            <p className="text-sm text-gray-400 mt-1 line-clamp-1">{video.channelTitle}</p>
+                            <h2 className="text-lg font-medium text-white line-clamp-2">
+                              {video.title}
+                            </h2>
+                            <p className="text-sm text-gray-400 mt-1 line-clamp-1">
+                              {video.channelTitle}
+                            </p>
                             <div className="flex flex-wrap gap-2 text-sm text-gray-500 mt-1">
-                              <span>{video.viewCount || 'N/A'}</span>
+                              <span>{video.viewCount || "N/A"}</span>
                               <span>&bull;</span>
-                              <span>{video.publishAt ? new Date(video.publishAt).toLocaleDateString() : 'Unknown date'}</span>
+                              <span>
+                                {video.publishAt
+                                  ? new Date(
+                                      video.publishAt
+                                    ).toLocaleDateString()
+                                  : "Unknown date"}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -141,7 +192,9 @@ function WatchLater() {
                             onClick={() => handleMenuToggle(video.videoId)}
                             className="menu-btn"
                           >
-                            <MoreVertIcon style={{ fontSize: '25px', cursor: 'pointer' }} />
+                            <MoreVertIcon
+                              style={{ fontSize: "25px", cursor: "pointer" }}
+                            />
                           </button>
                           {openMenuId === video.videoId && (
                             <div
