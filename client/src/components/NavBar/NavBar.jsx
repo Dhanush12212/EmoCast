@@ -6,7 +6,7 @@ import { FaRegBell } from 'react-icons/fa';
 import { assets } from '../../assets/assets';
 import SideFullBar from './SideFullBar';
 import ProfileBar from './ProfileBar';
-import { useAuth } from '../Contexts/AuthContext';
+import { API_URL } from '../../../config'; 
 import WebCamCapture from '../WebCam/WebCamCapture';
 
 function NavBar() {
@@ -14,8 +14,7 @@ function NavBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [listening, setListening] = useState(false);
-  const { user } = useAuth();
-
+  const user = JSON.parse(localStorage.getItem("user"));
   const recognitionRef = useRef(null);
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const navigate = useNavigate();
@@ -49,24 +48,27 @@ function NavBar() {
     recognitionRef.current.start();
     setListening(true);
   };
+ 
+  const profilePic = user?.profilePic
+    ? user.profilePic.startsWith('http')
+      ? user.profilePic
+      : `${API_URL}/${user.profilePic}`
+    : assets.Profile;
 
   return (
     <div className="flex items-center justify-between w-full px-3 sm:px-6 py-2 fixed top-0 bg-[#121212] z-10">
       {/* Left Section */}
       <div className="flex items-center gap-2 sm:gap-4 w-[30%] sm:w-[15%]">
-        {/* Sidebar Toggle */}
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
           <IoReorderThreeOutline className="w-8 h-8 sm:w-9 sm:h-9 text-white hover:bg-[#222222] rounded-full cursor-pointer p-1" />
         </button>
 
-        {/* Sidebar */}
         {isSidebarOpen && (
           <div className="fixed top-14 sm:top-20 left-0 h-full z-40 bg-[#121212]/90 backdrop-blur-md transition-all">
             <SideFullBar />
           </div>
         )}
 
-        {/* YouTube Logo */}
         <img
           className="w-28 sm:w-36 object-contain"
           src={assets.YouTube}
@@ -91,7 +93,6 @@ function NavBar() {
           />
         </div>
 
-        {/* Mic (hidden on very small devices) */}
         <button
           onClick={startListening}
           className={`hidden sm:flex items-center justify-center rounded-full bg-[#222222] p-2 sm:p-3 hover:bg-[#3F3F3F] transition-colors ${
@@ -105,21 +106,18 @@ function NavBar() {
 
       {/* Right Section */}
       <div className="flex items-center justify-end gap-3 sm:gap-6 w-[20%] sm:w-[15%]">
-        {/* Notification Bell */}
         <button className="hidden sm:block">
           <FaRegBell className="w-5 h-5 sm:w-6 sm:h-6 text-white cursor-pointer" />
         </button>
-
-        {/* Profile */}
+ 
         <button onClick={() => setIsProfileOpen(!isProfileOpen)}>
           <img
-            src={assets.Profile || user?.profilePic}
+            src={profilePic}
             alt="Profile"
             className="h-9 w-9 sm:h-11 sm:w-11 rounded-full object-cover border border-gray-600 hover:scale-105 transition-transform"
           />
         </button>
 
-        {/* Profile Bar */}
         {isProfileOpen && (
           <div className="fixed top-14 sm:top-3 right-3 sm:right-10 z-40">
             <ProfileBar />

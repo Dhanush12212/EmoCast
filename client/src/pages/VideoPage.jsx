@@ -41,13 +41,11 @@ function VideoPage() {
 
           <div className="flex flex-col md:flex-row flex-1 gap-5 p-5 md:p-12 overflow-hidden">
             {video && (
-              <>
-                {/* Video Player: full width on small, 70% on md+ */}
+              <> 
                 <div className="w-full flex flex-col">
                   <VideoPlayer video={video} />
                 </div>
-
-                {/* Recommended Videos: full width on small, 30% on md+ */}
+ 
                 <div className="w-full md:w-[40%] h-full bg-[#1a1b1c] rounded-xl overflow-auto shadow-md flex flex-col">
                   <h1 className="text-2xl md:text-2xl font-bold text-center my-2 text-gray-400">
                     Recommended Videos

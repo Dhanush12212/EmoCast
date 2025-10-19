@@ -32,8 +32,7 @@ function SideBar() {
           <span className="text-[11px] font-medium">{item.label}</span>
         </Link>
       ))}
-
-      {/* WebCam pinned at bottom */} 
+ 
       <div className="w-full px-2 flex flex-col items-center justify-center py-2 hover:bg-[#3D3D3D] rounded-xl transition-all duration-200 cursor-pointer">
         <WebCamCapture /> 
       </div> 

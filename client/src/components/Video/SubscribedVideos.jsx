@@ -19,8 +19,7 @@ function SubscribedVideos() {
   const navigate = useNavigate();
 
   const isLoggedIn = Boolean(localStorage.getItem("user"));
-
-  // Intersection Observer for infinite scroll
+ 
   const lastVideoRef = useCallback(
     (node) => {
       if (loading) return;
@@ -71,14 +70,11 @@ function SubscribedVideos() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Initial fetch on mount
+  }; 
   useEffect(() => {
     fetchVideos();
   }, []);
-
-  // Close menu when clicking outside
+ 
   const handleOutsideClick = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target)) {
       setOpenMenuId(null);
