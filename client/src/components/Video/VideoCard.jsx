@@ -110,7 +110,7 @@ function VideoCard({ selectedCategory, category }) {
   return (
     <>
       <LoaderOrError loading={loading && videos.length === 0} error={error} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6 px-3 sm:px-4 lg:px-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-3 sm:px-4 lg:px-6">
         {videos.length === 0 && !loading ? (
           <p className="text-center text-gray-400 text-lg mt-10 italic">
             {query
