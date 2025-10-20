@@ -57,6 +57,9 @@
 ### Home Page
 ![Home Page](./client/src/assets/HomePage.png)
 
+### Mobile View
+![Mobile View](./client/src/assets/Mobile.png)
+
 ### 🎥 Profile Page
 ![Profile Page](./client/src/assets/ProfilePage.png)
 

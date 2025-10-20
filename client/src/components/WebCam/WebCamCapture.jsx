@@ -148,7 +148,7 @@ function WebCamCapture({ onEmotion }) {
         title={syncActive ? "Capturing..." : "Start Sync"}
       >
         <LuScanFace className={`w-6 h-6 mb-1 ${syncActive ? "text-white" : "text-gray-200"}`} />
-        <span className={`text-md font-medium ${syncActive ? "text-white" : "text-gray-200"}`}>
+        <span className={`hidden md:flex text-md font-medium ${syncActive ? "text-white" : "text-gray-200"}`}>
           {syncActive ? "Capturing..." : "Sync"}
         </span>
       </div>

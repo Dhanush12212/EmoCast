@@ -70,14 +70,15 @@ function NavBar() {
         )}
 
         <img
-          className="w-28 sm:w-36 object-contain"
+          className="w-20 sm:w-28 md:w-36 lg:w-38 object-contain mr-1 transition-all duration-300"
           src={assets.YouTube}
           alt="YouTube Logo"
         />
+
       </div>
 
       {/* Center Section */}
-      <div className="flex items-center justify-center w-[50%] sm:w-[55%] gap-2 sm:gap-4">
+      <div className="flex items-center justify-center w-[50%] sm:w-[55%] gap-2 sm:gap-4 ">
         <div className="flex items-center w-full border border-[#383838] bg-[#222222] rounded-full h-10 sm:h-12 pr-2 sm:pr-4">
           <input
             className="w-full bg-[#222222] text-white text-sm sm:text-base outline-none pl-4 sm:pl-6 pr-2 sm:pr-3 rounded-l-full"
