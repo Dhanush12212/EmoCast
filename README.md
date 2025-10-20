@@ -58,7 +58,10 @@
 ![Home Page](./client/src/assets/HomePage.png)
 
 ### Mobile View
-![Mobile View](./client/src/assets/Mobile.png)
+<p align="center">
+  <img src="./client/src/assets/Mobile.png" alt="Mobile View" width="300">
+</p>
+
 
 ### 🎥 Profile Page
 ![Profile Page](./client/src/assets/ProfilePage.png)
