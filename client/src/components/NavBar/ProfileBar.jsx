@@ -1,7 +1,7 @@
 import React from 'react';
 import { assets } from '../../assets/assets';
 import { Link, useNavigate } from 'react-router-dom';
-import { MdOutlineDarkMode } from 'react-icons/md';
+// import { MdOutlineDarkMode } from 'react-icons/md';
 import { FaGoogle } from 'react-icons/fa';
 import { PiSignOut } from 'react-icons/pi';
 import axios from 'axios';
@@ -64,10 +64,10 @@ function Profile() {
           <span>Sign Out</span>
         </div>
 
-        <div className="flex items-center gap-4 hover:bg-[#3E3E3E] p-3 transition rounded-lg cursor-pointer">
+        {/* <div className="flex items-center gap-4 hover:bg-[#3E3E3E] p-3 transition rounded-lg cursor-pointer">
           <MdOutlineDarkMode className="w-6 h-6" />
           <span>Appearance: Dark Mode</span>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -180,12 +180,12 @@ function VideoCard({ selectedCategory, category }) {
                     </div>
                   </div>
 
-                  <div className="relative">
+                  <div className="relative mb-5">
                     <button
                       onClick={() => handleMenuToggle(video.videoId)}
                       className="menu-btn"
                     >
-                      <MoreVertIcon style={{ fontSize: '22px' }} />
+                      <MoreVertIcon style={{ fontSize: '22px'}} />
                     </button>
                     {openMenuId === video.videoId && (
                       <div
