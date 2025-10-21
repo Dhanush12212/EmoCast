@@ -114,9 +114,15 @@ function WebCamCapture({ onEmotion }) {
         title: "🔒 Login Required",
         text: "You need to log in before syncing your emotions.",
         confirmButtonText: "Okay",
-        confirmButtonColor: "#e50914", // YouTube red
-        background: "#1e1e1e", // Dark theme
+        confirmButtonColor: "#e50914",
+        background: "#1e1e1e",
         color: "#fff",
+        customClass: {
+          popup: "max-w-[90%] sm:max-w-[400px] md:max-w-[480px] rounded-2xl px-4 py-6", // responsive sizing
+          title: "text-base sm:text-lg md:text-xl font-semibold text-center",
+          htmlContainer: "text-xs sm:text-sm md:text-base text-gray-300 text-center",
+          confirmButton: "text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg font-medium",
+        },
       });
       return;
     }
